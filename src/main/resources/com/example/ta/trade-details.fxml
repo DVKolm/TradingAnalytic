@@ -212,12 +212,16 @@
                                        text="Изображение не загружено" />
                                 <HBox alignment="CENTER" spacing="12.0">
                                     <children>
-                                        <Button fx:id="uploadImageButton" onAction="#uploadImage" prefWidth="140.0"
+                                        <Button fx:id="uploadImageButton" onAction="#uploadImage" prefWidth="120.0"
                                                 style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: 600; -fx-background-radius: 6; -fx-cursor: hand;"
                                                 text="Загрузить" />
                                         <Button fx:id="removeImageButton" onAction="#removeImage" prefWidth="100.0"
                                                 style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: 600; -fx-background-radius: 6; -fx-cursor: hand;"
                                                 text="Удалить" />
+                                        <!-- НОВАЯ КНОПКА ПРОСМОТРА -->
+                                        <Button fx:id="viewFullImageButton" onAction="#viewFullImage" prefWidth="140.0"
+                                                style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: 600; -fx-background-radius: 6; -fx-cursor: hand;"
+                                                text="🔍 Открыть" visible="false" />
                                     </children>
                                 </HBox>
                             </children>

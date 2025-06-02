@@ -2,6 +2,7 @@ package com.example.ta.controller;
 
 import com.example.ta.events.NavigationEvent;
 import com.example.ta.domain.Trade;
+import com.example.ta.service.ImageViewerService;
 import com.example.ta.service.TradeService;
 import com.example.ta.util.DateMaskFormatter;
 import javafx.fxml.FXML;
@@ -18,6 +19,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -58,6 +60,7 @@ public class TradeDetailsController implements Initializable {
     @FXML private ImageView chartImageView;
     @FXML private Button uploadImageButton;
     @FXML private Button removeImageButton;
+    @FXML private Button viewFullImageButton; // НОВАЯ КНОПКА
     @FXML private Label imageStatusLabel;
 
     @FXML private Button editButton;
@@ -66,6 +69,7 @@ public class TradeDetailsController implements Initializable {
     private Trade currentTrade;
     private final TradeService tradeService;
     private final ApplicationEventPublisher eventPublisher;
+    private final ImageViewerService imageViewerService; // НОВЫЙ СЕРВИС
 
     @Setter
     private Stage dialogStage;
@@ -76,33 +80,36 @@ public class TradeDetailsController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         log.info("Инициализация TradeDetailsController");
 
-        createImagesFolder();
+        // Делаем текстовые области только для чтения
+        entryReasonArea.setEditable(false);
+        exitReasonArea.setEditable(false);
+        commentArea.setEditable(false);
 
+        // Настраиваем ImageView
+        chartImageView.setPreserveRatio(true);
+        chartImageView.setSmooth(true);
+        chartImageView.setCache(true);
+
+        // Настраиваем кнопки
         addButtonHoverEffects();
+
+        // Изначально скрываем кнопку просмотра
+        viewFullImageButton.setVisible(false);
 
         log.info("TradeDetailsController инициализирован");
     }
 
     private void addButtonHoverEffects() {
-        editButton.setOnMouseEntered(e ->
-                editButton.setStyle(editButton.getStyle() + "-fx-background-color: #e67e22;"));
-        editButton.setOnMouseExited(e ->
-                editButton.setStyle(editButton.getStyle().replace("-fx-background-color: #e67e22;", "-fx-background-color: #f39c12;")));
+        String buttonStyle = "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-border-radius: 5; -fx-cursor: hand; -fx-padding: 8 16 8 16;";
+        String hoverStyle = "-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-border-radius: 5; -fx-cursor: hand; -fx-padding: 8 16 8 16;";
 
-        closeButton.setOnMouseEntered(e ->
-                closeButton.setStyle(closeButton.getStyle() + "-fx-background-color: #7f8c8d;"));
-        closeButton.setOnMouseExited(e ->
-                closeButton.setStyle(closeButton.getStyle().replace("-fx-background-color: #7f8c8d;", "-fx-background-color: #95a5a6;")));
-
-        uploadImageButton.setOnMouseEntered(e ->
-                uploadImageButton.setStyle(uploadImageButton.getStyle() + "-fx-background-color: #2980b9;"));
-        uploadImageButton.setOnMouseExited(e ->
-                uploadImageButton.setStyle(uploadImageButton.getStyle().replace("-fx-background-color: #2980b9;", "-fx-background-color: #3498db;")));
-
-        removeImageButton.setOnMouseEntered(e ->
-                removeImageButton.setStyle(removeImageButton.getStyle() + "-fx-background-color: #c0392b;"));
-        removeImageButton.setOnMouseExited(e ->
-                removeImageButton.setStyle(removeImageButton.getStyle().replace("-fx-background-color: #c0392b;", "-fx-background-color: #e74c3c;")));
+        for (Button button : new Button[]{uploadImageButton, removeImageButton, viewFullImageButton, editButton, closeButton}) {
+            if (button != null) {
+                button.setStyle(buttonStyle);
+                button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+                button.setOnMouseExited(e -> button.setStyle(buttonStyle));
+            }
+        }
     }
 
     public void setTrade(Trade trade) {
@@ -112,100 +119,47 @@ public class TradeDetailsController implements Initializable {
     }
 
     private void displayTradeDetails() {
-        if (currentTrade == null) {
-            log.warn("Попытка отобразить детали null сделки");
-            return;
-        }
+        if (currentTrade == null) return;
 
-        log.info("Отображение деталей сделки: {}", currentTrade.getId());
-
-        titleLabel.setText("Детали сделки: " + currentTrade.getAssetName());
-
+        titleLabel.setText("Детали сделки #" + currentTrade.getId());
         assetNameLabel.setText(currentTrade.getAssetName());
-        tradeTypeLabel.setText(currentTrade.getTradeType().name().equals("LONG") ? "Buy (Long)" : "Sell (Short)");
-
-        String statusText = currentTrade.getStatus().name().equals("OPEN") ? "Открыта" : "Закрыта";
-        statusLabel.setText(statusText);
-        if (currentTrade.getStatus().name().equals("OPEN")) {
-            statusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-color: #fff3cd; -fx-text-fill: #856404; -fx-background-radius: 15; -fx-padding: 4 12 4 12;");
-        } else {
-            statusLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-background-radius: 15; -fx-padding: 4 12 4 12;");
-        }
-
-        if (currentTrade.getTradeDate() != null) {
-            tradeDateLabel.setText(currentTrade.getTradeDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        } else {
-            tradeDateLabel.setText("Не указана");
-        }
+        tradeTypeLabel.setText(currentTrade.getTradeType().getDisplayName());
+        statusLabel.setText(currentTrade.getStatus().getDisplayName());
+        tradeDateLabel.setText(currentTrade.getTradeDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 
         entryPointLabel.setText(formatPrice(currentTrade.getEntryPoint(), currentTrade.getCurrency()));
         exitPointLabel.setText(currentTrade.getExitPoint() != null ?
                 formatPrice(currentTrade.getExitPoint(), currentTrade.getCurrency()) : "Не закрыта");
         volumeLabel.setText(formatVolume(currentTrade.getVolume()));
+        volumeInCurrencyLabel.setText(currentTrade.getFormattedVolumeInCurrency());
 
-        if (currentTrade.getEntryPoint() != null && currentTrade.getVolume() != null) {
-            BigDecimal volumeInCurrency = currentTrade.getEntryPoint().multiply(currentTrade.getVolume());
-            volumeInCurrencyLabel.setText(formatPrice(volumeInCurrency, currentTrade.getCurrency()));
-        } else {
-            volumeInCurrencyLabel.setText("Не рассчитан");
-        }
+        profitLossLabel.setText(currentTrade.getFormattedProfitLoss());
+        priceMovementLabel.setText(currentTrade.getFormattedPriceMovement());
 
-        if (currentTrade.getProfitLoss() != null) {
-            String profitLossText = formatPrice(currentTrade.getProfitLoss(), currentTrade.getCurrency());
-            profitLossLabel.setText(profitLossText);
-
-            if (currentTrade.getProfitLoss().compareTo(BigDecimal.ZERO) > 0) {
-                profitLossLabel.setStyle("-fx-text-fill: #27ae60;");
-            } else if (currentTrade.getProfitLoss().compareTo(BigDecimal.ZERO) < 0) {
-                profitLossLabel.setStyle("-fx-text-fill: #e74c3c;");
-            } else {
-                profitLossLabel.setStyle("-fx-text-fill: #6c757d;");
-            }
-        } else {
-            profitLossLabel.setText("Не рассчитана");
-            profitLossLabel.setStyle("-fx-text-fill: #6c757d;");
-        }
-
-        if (currentTrade.getEntryPoint() != null && currentTrade.getExitPoint() != null) {
-            BigDecimal priceChange = currentTrade.getExitPoint().subtract(currentTrade.getEntryPoint());
-            BigDecimal priceChangePercent = priceChange.divide(currentTrade.getEntryPoint(), 4, BigDecimal.ROUND_HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
-
-            String sign = priceChange.compareTo(BigDecimal.ZERO) >= 0 ? "+" : "";
-            String movementText = sign + String.format("%.2f", priceChange) + " (" + sign + String.format("%.2f%%)", priceChangePercent);
-            priceMovementLabel.setText(movementText);
-
-            if (priceChange.compareTo(BigDecimal.ZERO) > 0) {
-                priceMovementLabel.setStyle("-fx-text-fill: #27ae60;");
-            } else if (priceChange.compareTo(BigDecimal.ZERO) < 0) {
-                priceMovementLabel.setStyle("-fx-text-fill: #e74c3c;");
-            } else {
-                priceMovementLabel.setStyle("-fx-text-fill: #6c757d;");
-            }
-        } else {
-            priceMovementLabel.setText("Не рассчитано");
-            priceMovementLabel.setStyle("-fx-text-fill: #6c757d;");
-        }
-
-        // Время
         entryTimeLabel.setText(formatDateTime(currentTrade.getEntryTime()));
         exitTimeLabel.setText(formatDateTime(currentTrade.getExitTime()));
 
         entryReasonArea.setText(currentTrade.getEntryReason() != null ? currentTrade.getEntryReason() : "");
         exitReasonArea.setText(currentTrade.getExitReason() != null ? currentTrade.getExitReason() : "");
         commentArea.setText(currentTrade.getComment() != null ? currentTrade.getComment() : "");
+
+        // Настраиваем цвет для прибыли/убытка
+        if (currentTrade.getProfitLoss() != null) {
+            String color = currentTrade.getProfitLoss().compareTo(BigDecimal.ZERO) >= 0 ? "#27ae60" : "#e74c3c";
+            profitLossLabel.setStyle("-fx-text-fill: " + color + "; -fx-font-weight: bold;");
+        }
+
+        log.info("Отображены детали сделки: {}", currentTrade.getId());
     }
 
-
     private String formatPrice(BigDecimal price, com.example.ta.domain.Currency currency) {
-        if (price == null) return "Не указана";
-        String symbol = currency != null ? currency.getSymbol() : "$";
-        return symbol + String.format("%.2f", price);
+        if (price == null) return "N/A";
+        return String.format("%s%.2f", currency.getSymbol(), price);
     }
 
     private String formatVolume(BigDecimal volume) {
-        if (volume == null) return "Не указан";
-        return String.format("%.4f", volume);
+        if (volume == null) return "N/A";
+        return String.format("%.8f", volume);
     }
 
     private String formatDateTime(LocalDateTime dateTime) {
@@ -214,99 +168,100 @@ public class TradeDetailsController implements Initializable {
     }
 
     private void loadChartImage() {
-        if (currentTrade == null || currentTrade.getChartImagePath() == null || currentTrade.getChartImagePath().trim().isEmpty()) {
+        if (currentTrade == null || !currentTrade.hasChartImage()) {
             chartImageView.setImage(null);
             imageStatusLabel.setText("Изображение не загружено");
-            removeImageButton.setDisable(true);
+            viewFullImageButton.setVisible(false);
             return;
         }
 
         try {
-            Path imagePath = Paths.get(IMAGES_FOLDER, currentTrade.getChartImagePath());
-            if (Files.exists(imagePath)) {
-                Image image = new Image(imagePath.toUri().toString());
+            File imageFile = new File(currentTrade.getChartImagePath());
+            if (imageFile.exists()) {
+                Image image = new Image(new FileInputStream(imageFile));
                 chartImageView.setImage(image);
-                imageStatusLabel.setText("Изображение загружено: " + currentTrade.getChartImagePath());
-                removeImageButton.setDisable(false);
-                log.info("Загружено изображение: {}", imagePath);
+                imageStatusLabel.setText("Изображение: " + imageFile.getName());
+                viewFullImageButton.setVisible(true); // ПОКАЗЫВАЕМ КНОПКУ
+                log.info("Загружено изображение: {}", currentTrade.getChartImagePath());
             } else {
                 chartImageView.setImage(null);
-                imageStatusLabel.setText("Файл изображения не найден: " + currentTrade.getChartImagePath());
-                removeImageButton.setDisable(true);
-                log.warn("Файл изображения не найден: {}", imagePath);
+                imageStatusLabel.setText("Файл изображения не найден");
+                viewFullImageButton.setVisible(false);
+                log.warn("Файл изображения не найден: {}", currentTrade.getChartImagePath());
             }
         } catch (Exception e) {
-            log.error("Ошибка при загрузке изображения", e);
             chartImageView.setImage(null);
-            imageStatusLabel.setText("Ошибка при загрузке изображения");
-            removeImageButton.setDisable(true);
+            imageStatusLabel.setText("Ошибка загрузки изображения");
+            viewFullImageButton.setVisible(false);
+            log.error("Ошибка при загрузке изображения", e);
         }
     }
 
     @FXML
     private void uploadImage() {
-        if (currentTrade == null) {
-            showErrorAlert("Сделка не выбрана");
-            return;
-        }
+        log.info("Загрузка изображения для сделки: {}", currentTrade.getId());
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Выберите изображение графика");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Изображения", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp")
+                new FileChooser.ExtensionFilter("Изображения", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp"),
+                new FileChooser.ExtensionFilter("PNG файлы", "*.png"),
+                new FileChooser.ExtensionFilter("JPG файлы", "*.jpg", "*.jpeg"),
+                new FileChooser.ExtensionFilter("Все файлы", "*.*")
         );
 
         File selectedFile = fileChooser.showOpenDialog(uploadImageButton.getScene().getWindow());
-        if (selectedFile == null) {
-            return;
-        }
 
-        try {
-            String fileExtension = getFileExtension(selectedFile.getName());
-            String fileName = "trade_" + currentTrade.getId() + "_" + System.currentTimeMillis() + fileExtension;
+        if (selectedFile != null) {
+            try {
+                createImagesFolder();
 
-            Path targetPath = Paths.get(IMAGES_FOLDER, fileName);
-            Files.copy(selectedFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                String fileName = "trade_" + currentTrade.getId() + "_" +
+                        System.currentTimeMillis() + getFileExtension(selectedFile.getName());
+                Path destinationPath = Paths.get(IMAGES_FOLDER, fileName);
 
-            currentTrade.setChartImagePath(fileName);
-            tradeService.save(currentTrade);
+                Files.copy(selectedFile.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
 
-            loadChartImage();
+                currentTrade.setChartImagePath(destinationPath.toString());
+                tradeService.save(currentTrade);
 
-            showSuccessAlert("Изображение успешно загружено");
-            log.info("Изображение загружено для сделки {}: {}", currentTrade.getId(), fileName);
+                loadChartImage();
+                showSuccessAlert("Изображение успешно загружено");
+                log.info("Изображение сохранено: {}", destinationPath);
 
-        } catch (IOException e) {
-            log.error("Ошибка при загрузке изображения", e);
-            showErrorAlert("Ошибка при загрузке изображения: " + e.getMessage());
+            } catch (IOException e) {
+                log.error("Ошибка при загрузке изображения", e);
+                showErrorAlert("Ошибка при загрузке изображения: " + e.getMessage());
+            }
         }
     }
 
     @FXML
     private void removeImage() {
-        if (currentTrade == null || currentTrade.getChartImagePath() == null) {
+        if (currentTrade == null || !currentTrade.hasChartImage()) {
             return;
         }
 
-        Alert alert = createStyledAlert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Подтверждение удаления");
-        alert.setHeaderText("Удаление изображения");
-        alert.setContentText("Вы действительно хотите удалить изображение графика?");
+        Alert confirmAlert = createStyledAlert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Подтверждение");
+        confirmAlert.setHeaderText("Удаление изображения");
+        confirmAlert.setContentText("Вы уверены, что хотите удалить изображение?");
 
-        alert.showAndWait().ifPresent(response -> {
+        confirmAlert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 try {
-                    Path imagePath = Paths.get(IMAGES_FOLDER, currentTrade.getChartImagePath());
-                    if (Files.exists(imagePath)) {
-                        Files.delete(imagePath);
-                        log.info("Удален файл изображения: {}", imagePath);
+                    // Удаляем файл
+                    File imageFile = new File(currentTrade.getChartImagePath());
+                    if (imageFile.exists()) {
+                        Files.delete(imageFile.toPath());
+                        log.info("Файл изображения удален: {}", currentTrade.getChartImagePath());
                     }
 
+                    // Обновляем запись в БД
                     currentTrade.setChartImagePath(null);
                     tradeService.save(currentTrade);
 
                     loadChartImage();
-
                     showSuccessAlert("Изображение успешно удалено");
 
                 } catch (IOException e) {
@@ -317,51 +272,54 @@ public class TradeDetailsController implements Initializable {
         });
     }
 
+    /**
+     * НОВЫЙ МЕТОД - Открывает изображение в полноэкранном режиме
+     */
     @FXML
-    private void editTrade() {
-        if (currentTrade == null) {
-            showErrorAlert("Сделка не выбрана для редактирования");
+    private void viewFullImage() {
+        if (currentTrade == null || !currentTrade.hasChartImage()) {
+            showErrorAlert("Изображение не загружено");
             return;
         }
 
-        log.info("Переход к редактированию сделки: {}", currentTrade.getId());
+        log.info("Открываем изображение в полноэкранном режиме: {}", currentTrade.getChartImagePath());
+        imageViewerService.openImage(currentTrade.getChartImagePath(),
+                chartImageView.getScene().getWindow());
+    }
 
+    @FXML
+    private void editTrade() {
+        log.info("Переход к редактированию сделки: {}", currentTrade.getId());
         eventPublisher.publishEvent(new NavigationEvent(NavigationEvent.NavigationType.EDIT_TRADE, currentTrade));
+        if (dialogStage != null) {
+            dialogStage.close();
+        }
     }
 
     @FXML
     private void closeDialog() {
-        log.info("Переход к списку сделок");
-        eventPublisher.publishEvent(new NavigationEvent(NavigationEvent.NavigationType.VIEW_TRADES));
+        log.info("Закрытие диалога деталей сделки");
+        if (dialogStage != null) {
+            dialogStage.close();
+        }
     }
 
-    private void createImagesFolder() {
-        try {
-            Path folder = Paths.get(IMAGES_FOLDER);
-            if (!Files.exists(folder)) {
-                Files.createDirectories(folder);
-                log.info("Создана папка для изображений: {}", folder.toAbsolutePath());
-            }
-        } catch (IOException e) {
-            log.error("Ошибка при создании папки для изображений", e);
+    private void createImagesFolder() throws IOException {
+        Path imagesPath = Paths.get(IMAGES_FOLDER);
+        if (!Files.exists(imagesPath)) {
+            Files.createDirectories(imagesPath);
+            log.info("Создана папка для изображений: {}", IMAGES_FOLDER);
         }
     }
 
     private String getFileExtension(String fileName) {
-        int lastIndexOf = fileName.lastIndexOf(".");
-        if (lastIndexOf == -1) {
-            return ".jpg";
-        }
-        return fileName.substring(lastIndexOf);
+        int lastDotIndex = fileName.lastIndexOf('.');
+        return lastDotIndex > 0 ? fileName.substring(lastDotIndex) : "";
     }
 
     private Alert createStyledAlert(Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
-        alert.getDialogPane().setStyle(
-                "-fx-font-family: 'Segoe UI'; " +
-                        "-fx-font-size: 13px; " +
-                        "-fx-background-color: white;"
-        );
+        alert.initOwner(uploadImageButton.getScene().getWindow());
         return alert;
     }
 
