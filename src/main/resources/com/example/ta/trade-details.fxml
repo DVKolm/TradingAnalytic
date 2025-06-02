@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.ta.controller.TradeDetailsController"
+            fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            style="-fx-background-color: #fafafa; -fx-border-color: transparent;">
+    <content>
+        <VBox spacing="24.0" style="-fx-background-color: #fafafa;">
+            <children>
+                <!-- Заголовок с кнопками действий -->
+                <VBox spacing="8.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="16.0">
+                            <children>
+                                <Label fx:id="titleLabel"
+                                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                                       text="Детали сделки" />
+
+                                <Region HBox.hgrow="ALWAYS" />
+
+                                <!-- Кнопки действий -->
+                                <HBox spacing="12.0" alignment="CENTER_RIGHT">
+                                    <children>
+                                        <Button fx:id="editButton" onAction="#editTrade"
+                                                style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 6; -fx-padding: 8 16 8 16; -fx-cursor: hand;"
+                                                text="Редактировать" />
+                                        <Button fx:id="closeButton" onAction="#closeDialog"
+                                                style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 6; -fx-padding: 8 16 8 16; -fx-cursor: hand;"
+                                                text="Закрыть" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </HBox>
+                        <Separator style="-fx-background-color: #ecf0f1;" />
+                    </children>
+                    <padding>
+                        <Insets bottom="16.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+
+                <!-- Основная информация -->
+                <VBox spacing="12.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+                               text="📊 Основная информация" />
+                        <GridPane hgap="20.0" vgap="12.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="220.0" prefWidth="220.0" />
+                            </columnConstraints>
+                            <children>
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;" text="Актив:" />
+                                <Label fx:id="assetNameLabel"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #2c3e50; -fx-font-weight: 500;"
+                                       GridPane.columnIndex="1" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;"
+                                       text="Тип сделки:" GridPane.rowIndex="1" />
+                                <Label fx:id="tradeTypeLabel"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #2c3e50; -fx-font-weight: 500;"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;"
+                                       text="Статус:" GridPane.rowIndex="2" />
+                                <Label fx:id="statusLabel"
+                                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-color: #e8f5e8; -fx-background-radius: 15; -fx-padding: 4 12 4 12;"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;"
+                                       text="Дата сделки:" GridPane.rowIndex="3" />
+                                <Label fx:id="tradeDateLabel"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #2c3e50; -fx-font-weight: 500;"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                            </children>
+                        </GridPane>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+
+                <!-- Цены и объемы -->
+                <VBox spacing="12.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+                               text="💰 Цены и объемы" />
+                        <GridPane hgap="20.0" vgap="12.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="220.0" prefWidth="220.0" />
+                            </columnConstraints>
+                            <children>
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;" text="Цена входа:" />
+                                <Label fx:id="entryPointLabel"
+                                       style="-fx-font-size: 15px; -fx-text-fill: #2980b9; -fx-font-weight: 600;"
+                                       GridPane.columnIndex="1" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;"
+                                       text="Цена выхода:" GridPane.rowIndex="1" />
+                                <Label fx:id="exitPointLabel"
+                                       style="-fx-font-size: 15px; -fx-text-fill: #8e44ad; -fx-font-weight: 600;"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;"
+                                       text="Количество:" GridPane.rowIndex="2" />
+                                <Label fx:id="volumeLabel"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #2c3e50; -fx-font-weight: 500;"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;"
+                                       text="Объем в валюте:" GridPane.rowIndex="3" />
+                                <Label fx:id="volumeInCurrencyLabel"
+                                       style="-fx-font-size: 15px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                            </children>
+                        </GridPane>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+
+                <!-- Результаты -->
+                <VBox spacing="12.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+                               text="📈 Результаты" />
+                        <HBox spacing="20.0" alignment="CENTER_LEFT">
+                            <children>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS"
+                                      style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 16;">
+                                    <children>
+                                        <Label style="-fx-font-weight: 600; -fx-text-fill: #6c757d; -fx-font-size: 12px;"
+                                               text="ПРИБЫЛЬ/УБЫТОК" />
+                                        <Label fx:id="profitLossLabel"
+                                               style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+                                    </children>
+                                </VBox>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS"
+                                      style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 16;">
+                                    <children>
+                                        <Label style="-fx-font-weight: 600; -fx-text-fill: #6c757d; -fx-font-size: 12px;"
+                                               text="ДВИЖЕНИЕ ЦЕНЫ" />
+                                        <Label fx:id="priceMovementLabel"
+                                               style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+
+                <!-- Время -->
+                <VBox spacing="12.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+                               text="⏰ Время сделки" />
+                        <GridPane hgap="20.0" vgap="12.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="220.0" prefWidth="220.0" />
+                            </columnConstraints>
+                            <children>
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;" text="Время входа:" />
+                                <Label fx:id="entryTimeLabel"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #2c3e50; -fx-font-weight: 500;"
+                                       GridPane.columnIndex="1" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;"
+                                       text="Время выхода:" GridPane.rowIndex="1" />
+                                <Label fx:id="exitTimeLabel"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #2c3e50; -fx-font-weight: 500;"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                            </children>
+                        </GridPane>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+
+                <!-- График -->
+                <VBox spacing="12.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+                               text="📊 График сделки" />
+                        <VBox alignment="CENTER" spacing="16.0">
+                            <children>
+                                <StackPane style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 16;">
+                                    <children>
+                                        <ImageView fx:id="chartImageView" fitHeight="220.0" fitWidth="320.0"
+                                                   pickOnBounds="true" preserveRatio="true"
+                                                   style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 1);" />
+                                    </children>
+                                </StackPane>
+                                <Label fx:id="imageStatusLabel"
+                                       style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"
+                                       text="Изображение не загружено" />
+                                <HBox alignment="CENTER" spacing="12.0">
+                                    <children>
+                                        <Button fx:id="uploadImageButton" onAction="#uploadImage" prefWidth="140.0"
+                                                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: 600; -fx-background-radius: 6; -fx-cursor: hand;"
+                                                text="Загрузить" />
+                                        <Button fx:id="removeImageButton" onAction="#removeImage" prefWidth="100.0"
+                                                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: 600; -fx-background-radius: 6; -fx-cursor: hand;"
+                                                text="Удалить" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+
+
+                <!-- Комментарии -->
+                <VBox spacing="12.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+                               text="💬 Причины и комментарии" />
+
+                        <VBox spacing="12.0">
+                            <children>
+                                <VBox spacing="6.0">
+                                    <children>
+                                        <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;"
+                                               text="Причина входа:" />
+                                        <TextArea fx:id="entryReasonArea" editable="false" prefHeight="70.0" wrapText="true"
+                                                  style="-fx-background-color: #f8f9fa; -fx-control-inner-background: #f8f9fa; -fx-text-fill: #2c3e50; -fx-font-size: 12px; -fx-border-color: #e9ecef; -fx-border-radius: 6; -fx-background-radius: 6;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="6.0">
+                                    <children>
+                                        <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;"
+                                               text="Причина выхода:" />
+                                        <TextArea fx:id="exitReasonArea" editable="false" prefHeight="70.0" wrapText="true"
+                                                  style="-fx-background-color: #f8f9fa; -fx-control-inner-background: #f8f9fa; -fx-text-fill: #2c3e50; -fx-font-size: 12px; -fx-border-color: #e9ecef; -fx-border-radius: 6; -fx-background-radius: 6;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="6.0">
+                                    <children>
+                                        <Label style="-fx-font-weight: 600; -fx-text-fill: #7f8c8d; -fx-font-size: 13px;"
+                                               text="Комментарий:" />
+                                        <TextArea fx:id="commentArea" editable="false" prefHeight="70.0" wrapText="true"
+                                                  style="-fx-background-color: #f8f9fa; -fx-control-inner-background: #f8f9fa; -fx-text-fill: #2c3e50; -fx-font-size: 12px; -fx-border-color: #e9ecef; -fx-border-radius: 6; -fx-background-radius: 6;" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+            </children>
+            <padding>
+                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+            </padding>
+        </VBox>
+    </content>
+</ScrollPane>

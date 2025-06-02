@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.ta.controller.MainController"
+            style="-fx-background-color: #f8f9fa;">
+    <top>
+        <!-- Верхняя панель -->
+        <VBox style="-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0, 0, 2);">
+            <children>
+                <!-- Заголовок приложения -->
+                <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-padding: 20 24 12 24;">
+                    <children>
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                               text="📈 Trading Analytics" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="currentTimeLabel"
+                               style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d; -fx-font-weight: 500;"
+                               text="01.01.2024 12:00:00" />
+                    </children>
+                </HBox>
+
+                <!-- Минималистичная панель навигации -->
+                <HBox alignment="CENTER_LEFT" spacing="16.0" style="-fx-padding: 0 24 20 24;">
+                    <children>
+                        <!-- Контейнер для навигационных кнопок с закругленным фоном -->
+                        <HBox spacing="4.0" alignment="CENTER_LEFT"
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 16; -fx-padding: 6;">
+                            <children>
+                                <Button fx:id="homeButton" onAction="#showHome"
+                                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20; -fx-effect: dropshadow(gaussian, rgba(52,152,219,0.2), 4, 0, 0, 1);"
+                                        text="🏠 Главная" />
+
+                                <Button fx:id="tradesListButton" onAction="#showTradesList"
+                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;"
+                                        text="📋 Сделки" />
+
+                                <Button fx:id="addTradeButton" onAction="#showAddTrade"
+                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;"
+                                        text="➕ Добавить сделку" />
+
+                                <Button fx:id="statisticsButton" onAction="#showStatistics"
+                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;"
+                                        text="📊 Аналитика" />
+
+                                <Button fx:id="positionCalculatorButton" onAction="#showPositionCalculator"
+                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 16 12 16;"
+                                        text="Калькулятор" />
+                            </children>
+                        </HBox>
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <!-- Кнопка обновления в отдельном контейнере -->
+                        <HBox style="-fx-background-color: #f8f9fa; -fx-background-radius: 16; -fx-padding: 6;">
+                            <children>
+                                <Button fx:id="refreshButton" onAction="#refreshCurrentView"
+                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;"
+                                        text="🔄 Обновить" />
+                            </children>
+                        </HBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+
+    <center>
+        <!-- Основная область контента -->
+        <StackPane fx:id="contentArea" style="-fx-background-color: #f8f9fa;" />
+    </center>
+
+    <bottom>
+        <!-- Современная нижняя статусная панель -->
+        <HBox alignment="CENTER_LEFT" spacing="20.0"
+              style="-fx-background-color: white; -fx-padding: 16 24 16 24; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, -2);">
+            <children>
+                <Label fx:id="statusLabel"
+                       style="-fx-font-size: 13px; -fx-text-fill: #495057; -fx-font-weight: 500;"
+                       text="Готов к работе" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <HBox spacing="16.0" alignment="CENTER_RIGHT">
+                    <children>
+                        <Label fx:id="userInfoLabel"
+                               style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: 500;"
+                               text="👤 Пользователь: Трейдер" />
+
+                        <Separator orientation="VERTICAL"
+                                   style="-fx-background-color: #e9ecef;"
+                                   prefHeight="16.0" />
+
+                        <Label fx:id="versionLabel"
+                               style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: 500;"
+                               text="📱 Версия: 1.0.0" />
+                    </children>
+                </HBox>
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

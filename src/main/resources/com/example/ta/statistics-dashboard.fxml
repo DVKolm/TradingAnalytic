@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.ta.controller.StatisticsController"
+            fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            style="-fx-background-color: #f8f9fa; -fx-border-color: transparent;">
+   <content>
+      <VBox spacing="24.0" style="-fx-background-color: #f8f9fa;">
+         <children>
+            <!-- Заголовок -->
+            <VBox spacing="16.0"
+                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+               <children>
+                  <VBox spacing="4.0">
+                     <children>
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                               text="📊 Статистика торговли" />
+                        <Label style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"
+                               text="Анализ результатов только закрытых сделок за выбранный период" />
+                     </children>
+                  </VBox>
+
+                  <Separator style="-fx-background-color: #ecf0f1;" />
+
+                  <!-- Панель управления периодом -->
+                  <HBox alignment="CENTER_LEFT" spacing="16.0">
+                     <children>
+                        <VBox spacing="4.0">
+                           <children>
+                              <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 13px;"
+                                     text="Период:" />
+                              <ComboBox fx:id="periodTypeComboBox"
+                                        promptText="Выберите период"
+                                        style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 6; -fx-background-radius: 6; -fx-font-size: 13px;"
+                                        prefWidth="160.0" />
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="4.0">
+                           <children>
+                              <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 13px;"
+                                     text="От:" />
+                              <DatePicker fx:id="startDatePicker"
+                                          style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 6; -fx-background-radius: 6; -fx-font-size: 13px;" />
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="4.0">
+                           <children>
+                              <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 13px;"
+                                     text="До:" />
+                              <DatePicker fx:id="endDatePicker"
+                                          style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 6; -fx-background-radius: 6; -fx-font-size: 13px;" />
+                           </children>
+                        </VBox>
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <Button onAction="#calculateStatistics"
+                                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-padding: 10 20 10 20; -fx-cursor: hand;"
+                                text="📈 Рассчитать" />
+
+                        <Button onAction="#exportToExcel"
+                                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-padding: 10 20 10 20; -fx-cursor: hand;"
+                                text="📊 Экспорт Excel" />
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="24.0" right="24.0" top="20.0" />
+               </padding>
+            </VBox>
+
+            <!-- Остальной контент остается без изменений... -->
+            <!-- Статистические карточки -->
+            <VBox spacing="16.0"
+                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+               <children>
+                  <Label style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #34495e;"
+                         text="📋 Основные показатели закрытых сделок" />
+
+                  <GridPane hgap="20.0" vgap="15.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" prefWidth="250.0" percentWidth="33.33" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" prefWidth="250.0" percentWidth="33.33" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" prefWidth="250.0" percentWidth="33.33" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="100.0" prefHeight="110.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="100.0" prefHeight="110.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="100.0" prefHeight="110.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <!-- Всего закрытых сделок -->
+                        <VBox alignment="CENTER" spacing="8.0"
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 20;"
+                              GridPane.columnIndex="0" GridPane.rowIndex="0">
+                           <children>
+                              <Label style="-fx-font-size: 24px;" text="💼" />
+                              <Label fx:id="totalTradesStatLabel"
+                                     style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3498db;"
+                                     text="0" />
+                              <Label style="-fx-font-size: 13px; -fx-text-fill: #495057; -fx-text-alignment: center; -fx-font-weight: 600;"
+                                     text="ЗАКРЫТЫХ СДЕЛОК" />
+                           </children>
+                        </VBox>
+
+                        <!-- Общая прибыль -->
+                        <VBox alignment="CENTER" spacing="8.0"
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 20;"
+                              GridPane.columnIndex="1" GridPane.rowIndex="0">
+                           <children>
+                              <Label style="-fx-font-size: 24px;" text="💰" />
+                              <Label fx:id="totalProfitStatLabel"
+                                     style="-fx-font-size: 24px; -fx-font-weight: bold;"
+                                     text="0.00" />
+                              <Label style="-fx-font-size: 13px; -fx-text-fill: #495057; -fx-text-alignment: center; -fx-font-weight: 600;"
+                                     text="ОБЩАЯ ПРИБЫЛЬ" />
+                           </children>
+                        </VBox>
+
+                        <!-- Общий объем -->
+                        <VBox alignment="CENTER" spacing="8.0"
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 20;"
+                              GridPane.columnIndex="2" GridPane.rowIndex="0">
+                           <children>
+                              <Label style="-fx-font-size: 24px;" text="📊" />
+                              <Label fx:id="totalVolumeStatLabel"
+                                     style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #9b59b6;"
+                                     text="0.00" />
+                              <Label style="-fx-font-size: 13px; -fx-text-fill: #495057; -fx-text-alignment: center; -fx-font-weight: 600;"
+                                     text="ОБЩИЙ ОБЪЕМ" />
+                           </children>
+                        </VBox>
+
+                        <!-- Прибыльные сделки -->
+                        <VBox alignment="CENTER" spacing="8.0"
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 20;"
+                              GridPane.columnIndex="0" GridPane.rowIndex="1">
+                           <children>
+                              <Label style="-fx-font-size: 24px;" text="✅" />
+                              <Label fx:id="profitableTradesStatLabel"
+                                     style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"
+                                     text="0" />
+                              <Label style="-fx-font-size: 13px; -fx-text-fill: #495057; -fx-text-alignment: center; -fx-font-weight: 600;"
+                                     text="ПРИБЫЛЬНЫХ" />
+                           </children>
+                        </VBox>
+
+                        <!-- Убыточные сделки -->
+                        <VBox alignment="CENTER" spacing="8.0"
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 20;"
+                              GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <children>
+                              <Label style="-fx-font-size: 24px;" text="❌" />
+                              <Label fx:id="losingTradesStatLabel"
+                                     style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;"
+                                     text="0" />
+                              <Label style="-fx-font-size: 13px; -fx-text-fill: #495057; -fx-text-alignment: center; -fx-font-weight: 600;"
+                                     text="УБЫТОЧНЫХ" />
+                           </children>
+                        </VBox>
+
+                        <!-- Винрейт -->
+                        <VBox alignment="CENTER" spacing="8.0"
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 20;"
+                              GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <children>
+                              <Label style="-fx-font-size: 24px;" text="🎯" />
+                              <Label fx:id="winRateStatLabel"
+                                     style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #f39c12;"
+                                     text="0%" />
+                              <Label style="-fx-font-size: 13px; -fx-text-fill: #495057; -fx-text-alignment: center; -fx-font-weight: 600;"
+                                     text="ПРОЦЕНТ УСПЕХА" />
+                           </children>
+                        </VBox>
+
+                        <!-- Средняя прибыль -->
+                        <VBox alignment="CENTER" spacing="8.0"
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 20;"
+                              GridPane.columnIndex="0" GridPane.rowIndex="2">
+                           <children>
+                              <Label style="-fx-font-size: 24px;" text="📈" />
+                              <Label fx:id="avgProfitStatLabel"
+                                     style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #17a2b8;"
+                                     text="0.00" />
+                              <Label style="-fx-font-size: 13px; -fx-text-fill: #495057; -fx-text-alignment: center; -fx-font-weight: 600;"
+                                     text="СРЕДНЯЯ ПРИБЫЛЬ" />
+                           </children>
+                        </VBox>
+
+                        <!-- Максимальная прибыль -->
+                        <VBox alignment="CENTER" spacing="8.0"
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 20;"
+                              GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <children>
+                              <Label style="-fx-font-size: 24px;" text="🚀" />
+                              <Label fx:id="maxProfitStatLabel"
+                                     style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #28a745;"
+                                     text="0.00" />
+                              <Label style="-fx-font-size: 13px; -fx-text-fill: #495057; -fx-text-alignment: center; -fx-font-weight: 600;"
+                                     text="МАКС. ПРИБЫЛЬ" />
+                           </children>
+                        </VBox>
+
+                        <!-- Максимальный убыток -->
+                        <VBox alignment="CENTER" spacing="8.0"
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 20;"
+                              GridPane.columnIndex="2" GridPane.rowIndex="2">
+                           <children>
+                              <Label style="-fx-font-size: 24px;" text="📉" />
+                              <Label fx:id="maxLossStatLabel"
+                                     style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #dc3545;"
+                                     text="0.00" />
+                              <Label style="-fx-font-size: 13px; -fx-text-fill: #495057; -fx-text-alignment: center; -fx-font-weight: 600;"
+                                     text="МАКС. УБЫТОК" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </GridPane>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="24.0" right="24.0" top="20.0" />
+               </padding>
+            </VBox>
+
+            <!-- График кривой эквити -->
+            <VBox spacing="16.0"
+                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+               <children>
+                  <Label style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #34495e;"
+                         text="📊 Кривая эквити" />
+
+                  <LineChart fx:id="equityCurveChart" prefHeight="400.0"
+                             style="-fx-background-color: white; -fx-background-radius: 8;">
+                     <xAxis>
+                        <CategoryAxis side="BOTTOM" />
+                     </xAxis>
+                     <yAxis>
+                        <NumberAxis side="LEFT" />
+                     </yAxis>
+                  </LineChart>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="24.0" right="24.0" top="20.0" />
+               </padding>
+            </VBox>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+   </content>
+</ScrollPane>

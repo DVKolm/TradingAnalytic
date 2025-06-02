@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: Trading Analytics
+
+  datasource:
+    # Используем путь БЕЗ подпапок - прямо в домашней папке
+    url: jdbc:sqlite:${user.home}/myapp.db
+    driver-class-name: org.sqlite.JDBC
+
+    hikari:
+      maximum-pool-size: 1
+      connection-timeout: 30000
+
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+logging:
+  level:
+    root: INFO
+    com.example.ta: DEBUG

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.ta.controller.TradesListController"
+      spacing="20.0" style="-fx-background-color: #fafafa;">
+
+    <!-- Заголовок и поиск -->
+    <VBox spacing="16.0"
+          style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+        <children>
+            <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                   text="📊 Список сделок" />
+
+            <!-- Панель поиска -->
+            <HBox spacing="12.0" alignment="CENTER_LEFT">
+                <children>
+                    <TextField fx:id="searchField" promptText="Поиск по названию актива..."
+                               prefWidth="200.0"
+                               style="-fx-background-radius: 6; -fx-border-color: #dee2e6; -fx-border-radius: 6;" />
+
+                    <ComboBox fx:id="statusFilterComboBox" promptText="Статус"
+                              prefWidth="120.0"
+                              style="-fx-background-radius: 6;" />
+
+                    <DatePicker fx:id="startDatePicker" promptText="Дата от"
+                                prefWidth="120.0"
+                                style="-fx-background-radius: 6;" />
+
+                    <DatePicker fx:id="endDatePicker" promptText="Дата до"
+                                prefWidth="120.0"
+                                style="-fx-background-radius: 6;" />
+
+                    <Button fx:id="searchButton" onAction="#searchTrades"
+                            style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: 600; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="🔍 Найти" />
+
+                    <Button fx:id="clearFiltersButton" onAction="#clearFilters"
+                            style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: 600; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Очистить" />
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <Button fx:id="refreshButton" onAction="#refreshTrades"
+                            style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: 600; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="🔄 Обновить" />
+                </children>
+            </HBox>
+        </children>
+        <padding>
+            <Insets bottom="16.0" left="20.0" right="20.0" top="20.0" />
+        </padding>
+    </VBox>
+
+    <!-- Статистика -->
+    <HBox spacing="16.0">
+        <children>
+            <VBox spacing="8.0" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 1);">
+                <children>
+                    <Label style="-fx-font-weight: 600; -fx-text-fill: #6c757d; -fx-font-size: 12px;"
+                           text="ВСЕГО СДЕЛОК" />
+                    <Label fx:id="totalTradesLabel"
+                           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                           text="0" />
+                </children>
+            </VBox>
+
+            <VBox spacing="8.0" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 1);">
+                <children>
+                    <Label style="-fx-font-weight: 600; -fx-text-fill: #6c757d; -fx-font-size: 12px;"
+                           text="ОБЩАЯ ПРИБЫЛЬ" />
+                    <Label fx:id="totalProfitLabel"
+                           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"
+                           text=" $0.00 " />
+                </children>
+            </VBox>
+
+            <VBox spacing="8.0" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 1);">
+                <children>
+                    <Label style="-fx-font-weight: 600; -fx-text-fill: #6c757d; -fx-font-size: 12px;"
+                           text="ВИНРЕЙТ" />
+                    <Label fx:id="winRateLabel"
+                           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #3498db;"
+                           text="0%" />
+                </children>
+            </VBox>
+        </children>
+    </HBox>
+
+    <!-- Таблица сделок -->
+    <VBox VBox.vgrow="ALWAYS" spacing="0"
+          style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+        <children>
+            <HBox alignment="CENTER_LEFT" spacing="16.0"
+                  style="-fx-background-color: #f8f9fa; -fx-background-radius: 12 12 0 0; -fx-padding: 12 20 12 20; -fx-border-color: #dee2e6; -fx-border-width: 0 0 1 0;">
+                <children>
+                    <Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #495057;"
+                           text="📋 Список сделок" />
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <Label fx:id="resultCountLabel"
+                           style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"
+                           text="Найдено: 0 сделок" />
+                </children>
+            </HBox>
+
+            <TableView fx:id="tradesTable" VBox.vgrow="ALWAYS"
+                       style="-fx-background-color: white; -fx-background-radius: 0 0 12 12;">
+                <columns>
+                    <TableColumn fx:id="assetColumn" prefWidth="120.0" text="Актив" />
+                    <TableColumn fx:id="typeColumn" prefWidth="80.0" text="Тип" />
+                    <TableColumn fx:id="statusColumn" prefWidth="80.0" text="Статус" />
+                    <TableColumn fx:id="dateColumn" prefWidth="100.0" text="Дата" />
+                    <TableColumn fx:id="entryPriceColumn" prefWidth="100.0" text="Вход" />
+                    <TableColumn fx:id="exitPriceColumn" prefWidth="100.0" text="Выход" />
+                    <TableColumn fx:id="volumeColumn" prefWidth="100.0" text="Объем" />
+                    <TableColumn fx:id="profitLossColumn" prefWidth="100.0" text="П/У" />
+                    <TableColumn fx:id="actionsColumn" prefWidth="150.0" text="Действия" />
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+            </TableView>
+        </children>
+    </VBox>
+
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+</VBox>

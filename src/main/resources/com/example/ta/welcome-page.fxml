@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.ta.controller.WelcomeDashboardController"
+            fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            style="-fx-background-color: #f8f9fa; -fx-border-color: transparent;">
+    <content>
+        <VBox spacing="30.0" style="-fx-background-color: #f8f9fa;">
+            <children>
+                <!-- Приветственный блок -->
+                <VBox alignment="CENTER" spacing="16.0"
+                      style="-fx-background-color: linear-gradient(to right, #667eea 0%, #764ba2 100%); -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 12, 0, 0, 4);">
+                    <children>
+                        <Label style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white;"
+                               text="📈 Trading Analytics" />
+                        <Label style="-fx-font-size: 16px; -fx-text-fill: rgba(255,255,255,0.9); -fx-text-alignment: center;"
+                               text="Профессиональная система анализа торговых операций" />
+                        <Label fx:id="welcomeTimeLabel"
+                               style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.8);" />
+                    </children>
+                    <padding>
+                        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+                    </padding>
+                </VBox>
+
+                <!-- Быстрая статистика -->
+                <VBox spacing="20.0">
+                    <children>
+                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                               text="📊 Быстрый обзор" />
+
+                        <HBox spacing="20.0" alignment="CENTER">
+                            <children>
+                                <!-- Общее количество сделок -->
+                                <VBox spacing="12.0" HBox.hgrow="ALWAYS"
+                                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2); -fx-padding: 24;">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                            <children>
+                                                <Label style="-fx-font-size: 24px;" text="💼" />
+                                                <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                                    <children>
+                                                        <Label style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #3498db;"
+                                                               fx:id="totalTradesLabel" text="0" />
+                                                        <Label style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d; -fx-font-weight: 600;"
+                                                               text="ВСЕГО СДЕЛОК" />
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+
+                                <!-- Общая прибыль -->
+                                <VBox spacing="12.0" HBox.hgrow="ALWAYS"
+                                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2); -fx-padding: 24;">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                            <children>
+                                                <Label style="-fx-font-size: 24px;" text="💰" />
+                                                <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                                    <children>
+                                                        <Label style="-fx-font-size: 28px; -fx-font-weight: bold;"
+                                                               fx:id="totalProfitLabel" text=" 0.00 $  " />
+                                                        <Label style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d; -fx-font-weight: 600;"
+                                                               text="ОБЩАЯ ПРИБЫЛЬ" />
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+
+                                <!-- Процент успешных сделок -->
+                                <VBox spacing="12.0" HBox.hgrow="ALWAYS"
+                                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2); -fx-padding: 24;">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                            <children>
+                                                <Label style="-fx-font-size: 24px;" text="🎯" />
+                                                <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                                    <children>
+                                                        <Label style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"
+                                                               fx:id="winRateLabel" text="0%" />
+                                                        <Label style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d; -fx-font-weight: 600;"
+                                                               text="ПРОЦЕНТ УСПЕХА" />
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <!-- Быстрые действия -->
+                <VBox spacing="20.0">
+                    <children>
+                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                               text="⚡ Быстрые действия" />
+
+                        <HBox spacing="16.0" alignment="CENTER">
+                            <children>
+                                <Button onAction="#quickAddTrade" prefWidth="200.0" prefHeight="80.0"
+                                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(52,152,219,0.3), 8, 0, 0, 2);">
+                                    <graphic>
+                                        <VBox spacing="8.0" alignment="CENTER">
+                                            <children>
+                                                <Label style="-fx-font-size: 24px; -fx-text-fill: white;" text="➕" />
+                                                <Label style="-fx-font-size: 14px; -fx-text-fill: white; -fx-font-weight: 600;" text="Добавить сделку" />
+                                            </children>
+                                        </VBox>
+                                    </graphic>
+                                </Button>
+
+                                <Button onAction="#quickViewTrades" prefWidth="200.0" prefHeight="80.0"
+                                        style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(155,89,182,0.3), 8, 0, 0, 2);">
+                                    <graphic>
+                                        <VBox spacing="8.0" alignment="CENTER">
+                                            <children>
+                                                <Label style="-fx-font-size: 24px; -fx-text-fill: white;" text="📋" />
+                                                <Label style="-fx-font-size: 14px; -fx-text-fill: white; -fx-font-weight: 600;" text="Просмотр сделок" />
+                                            </children>
+                                        </VBox>
+                                    </graphic>
+                                </Button>
+
+                                <Button onAction="#quickStatistics" prefWidth="200.0" prefHeight="80.0"
+                                        style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(231,76,60,0.3), 8, 0, 0, 2);">
+                                    <graphic>
+                                        <VBox spacing="8.0" alignment="CENTER">
+                                            <children>
+                                                <Label style="-fx-font-size: 24px; -fx-text-fill: white;" text="📊" />
+                                                <Label style="-fx-font-size: 14px; -fx-text-fill: white; -fx-font-weight: 600;" text="Аналитика" />
+                                            </children>
+                                        </VBox>
+                                    </graphic>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <!-- Последние сделки -->
+                <VBox spacing="20.0">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                            <children>
+                                <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                                       text="🕒 Последние сделки" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button onAction="#viewAllTrades"
+                                        style="-fx-background-color: transparent; -fx-text-fill: #3498db; -fx-font-size: 14px; -fx-font-weight: 600; -fx-underline: true; -fx-cursor: hand;"
+                                        text="Посмотреть все →" />
+                            </children>
+                        </HBox>
+
+                        <VBox fx:id="recentTradesContainer" spacing="12.0"
+                              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2); -fx-padding: 20;">
+                            <children>
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d; -fx-text-alignment: center;"
+                                       text="Загрузка последних сделок..." />
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+
+                <!-- Полезные советы -->
+                <VBox spacing="20.0">
+                    <children>
+                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                               text="💡 Совет дня" />
+
+                        <VBox spacing="16.0"
+                              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2); -fx-padding: 24;">
+                            <children>
+                                <HBox spacing="16.0" alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label style="-fx-font-size: 32px;" text="🎯" />
+                                        <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label fx:id="tipTitleLabel"
+                                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                                                       text="Ведите подробные записи" />
+                                                <Label fx:id="tipContentLabel" wrapText="true"
+                                                       style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d; -fx-line-spacing: 2px;"
+                                                       text="Записывайте не только цены входа и выхода, но и причины принятия решений. Это поможет вам анализировать свои ошибки и улучшать торговую стратегию." />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+            <padding>
+                <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+            </padding>
+        </VBox>
+    </content>
+</ScrollPane>
