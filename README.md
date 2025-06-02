@@ -1,30 +1,30 @@
 # 📊 Trading Analytics
 
-**Современное приложение для анализа торговых операций с интуитивным JavaFX интерфейсом**
+**Modern trading analytics application with intuitive JavaFX interface**
 
-## 🌟 Обзор
+## 🌟 Overview
 
-Trading Analytics - это мощное desktop-приложение для трейдеров, которое помогает анализировать торговые операции, отслеживать прибыльность и принимать обоснованные торговые решения. Приложение построено на современном технологическом стеке Java 21 + Spring Boot + JavaFX.
+Trading Analytics is a powerful desktop application for traders that helps analyze trades, track profitability and make informed trading decisions. The application is built on the modern Java 21 + Spring Boot + JavaFX technology stack.
 
-## ✨ Основные возможности
+## ✨ Main features
 
-### 📈 Управление сделками
-- ✅ Добавление и редактирование торговых операций
-- ✅ Поддержка различных типов активов (акции, валюты, криптовалюты)
-- ✅ Автоматический расчет прибыли/убытка
-- ✅ Статусы сделок (открытая, закрытая)
+### 📈 Trade management
+- ✅ Adding and editing trades
+- ✅ Support for different types of assets (stocks, currencies, cryptocurrencies)
+- ✅ Automatic profit/loss calculation
+- ✅ Transaction statuses (open, closed)
 
-### 📊 Аналитика и отчеты
-- 📊 Интерактивные графики и диаграммы
-- 📈 Статистика прибыльности по периодам
-- 🎯 Анализ успешных и убыточных сделок
-- 📋 Детальные отчеты по активам
+### 📊 Analytics and reports
+- 📊 Interactive charts and diagrams
+- 📈 Profitability statistics by periods
+- 🎯 Analysis of successful and losing trades
+- 📋 Detailed reports by assets
 
-### 💾 Управление данными
-- 🗄️ Локальная SQLite база данных
-- 📤 Экспорт данных в Excel
-- 📥 Импорт торговых операций
-- 🔍 Продвинутый поиск и фильтрация
+### 💾 Data management
+- 🗄️ Local SQLite database
+- 📤 Export data to Excel
+- 📥 Import of trade transactions
+- 🔍 Advanced search and filtering
 
 ![image](https://github.com/user-attachments/assets/7bb7701d-510a-437d-b43e-a117b90d82d4)
 
