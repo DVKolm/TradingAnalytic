@@ -8,6 +8,12 @@
             fx:controller="com.example.ta.controller.PositionCalculatorController"
             fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
             style="-fx-background-color: #f8f9fa; -fx-border-color: transparent;">
+
+    <!-- Определение ToggleGroup -->
+    <fx:define>
+        <ToggleGroup fx:id="tradeTypeToggleGroup" />
+    </fx:define>
+
     <content>
         <VBox spacing="24.0" style="-fx-background-color: #f8f9fa;">
             <children>
@@ -39,33 +45,47 @@
                                 <ColumnConstraints hgrow="ALWAYS" minWidth="250.0" prefWidth="300.0" />
                             </columnConstraints>
                             <children>
+                                <!-- Тип сделки -->
                                 <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
-                                       text="Депозит (USDT):" />
-                                <TextField fx:id="depositField"
-                                           promptText="250.00"
-                                           style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
-                                           GridPane.columnIndex="1" />
+                                       text="Тип сделки:" />
+                                <HBox spacing="12.0" alignment="CENTER_LEFT" GridPane.columnIndex="1">
+                                    <children>
+                                        <RadioButton fx:id="longRadioButton" selected="true" toggleGroup="$tradeTypeToggleGroup"
+                                                     style="-fx-font-size: 14px; -fx-font-weight: 600;"
+                                                     text="📈 Long" />
+                                        <RadioButton fx:id="shortRadioButton" toggleGroup="$tradeTypeToggleGroup"
+                                                     style="-fx-font-size: 14px; -fx-font-weight: 600;"
+                                                     text="📉 Short" />
+                                    </children>
+                                </HBox>
 
                                 <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
-                                       text="Риск (%):" GridPane.rowIndex="1" />
-                                <TextField fx:id="riskField"
-                                           promptText="2.0"
+                                       text="Депозит (USDT):" GridPane.rowIndex="1" />
+                                <TextField fx:id="depositField"
+                                           promptText="250.00"
                                            style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
                                            GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
                                 <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
-                                       text="Цена входа:" GridPane.rowIndex="2" />
-                                <TextField fx:id="entryPriceField"
-                                           promptText="109800.00"
+                                       text="Риск (%):" GridPane.rowIndex="2" />
+                                <TextField fx:id="riskField"
+                                           promptText="2.0"
                                            style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
                                            GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                                 <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
-                                       text="Стоп-лосс:" GridPane.rowIndex="3" />
+                                       text="Цена входа:" GridPane.rowIndex="3" />
+                                <TextField fx:id="entryPriceField"
+                                           promptText="109800.00"
+                                           style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
+                                       text="Стоп-лосс:" GridPane.rowIndex="4" />
                                 <TextField fx:id="stopPriceField"
                                            promptText="111500.00"
                                            style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
-                                           GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                           GridPane.columnIndex="1" GridPane.rowIndex="4" />
                             </children>
                         </GridPane>
                     </children>
@@ -79,9 +99,9 @@
                       style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
                     <children>
                         <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
-                               text="Автоматические стоп-лоссы" />
-                        <Label style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"
-                               text="Введите цену входа, и система автоматически рассчитает стоп-лоссы" />
+                               text="⚡ Автоматические стоп-лоссы" />
+                        <Label fx:id="autoStopDescription" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"
+                               text="Введите цену входа, и система автоматически рассчитает стоп-лоссы для Long позиций" />
 
                         <HBox spacing="20.0" alignment="CENTER">
                             <children>
@@ -89,8 +109,8 @@
                                 <VBox spacing="8.0" alignment="CENTER" HBox.hgrow="ALWAYS"
                                       style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 16;">
                                     <children>
-                                        <Label style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #27ae60;"
-                                               text="Агрессивный (-1.5%)" />
+                                        <Label fx:id="stopLoss15TypeLabel" style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #27ae60;"
+                                               text="Агрессивный (1.5%)" />
                                         <Label fx:id="stopLoss15Label"
                                                style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;"
                                                text="—" />
@@ -104,8 +124,8 @@
                                 <VBox spacing="8.0" alignment="CENTER" HBox.hgrow="ALWAYS"
                                       style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 16;">
                                     <children>
-                                        <Label style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #f39c12;"
-                                               text="Умеренный (-2.5%)" />
+                                        <Label fx:id="stopLoss25TypeLabel" style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #f39c12;"
+                                               text="Умеренный (2.5%)" />
                                         <Label fx:id="stopLoss25Label"
                                                style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;"
                                                text="—" />
@@ -119,8 +139,8 @@
                                 <VBox spacing="8.0" alignment="CENTER" HBox.hgrow="ALWAYS"
                                       style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 16;">
                                     <children>
-                                        <Label style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #e74c3c;"
-                                               text="Консервативный (-5%)" />
+                                        <Label fx:id="stopLoss5TypeLabel" style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #e74c3c;"
+                                               text="Консервативный (5%)" />
                                         <Label fx:id="stopLoss5Label"
                                                style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;"
                                                text="—" />
@@ -142,11 +162,11 @@
                       style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
                     <children>
                         <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
-                               text="Результаты расчетов" />
+                               text="💰 Результаты расчета" />
 
                         <GridPane hgap="20.0" vgap="16.0">
                             <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" />
                                 <ColumnConstraints hgrow="ALWAYS" minWidth="250.0" prefWidth="300.0" />
                             </columnConstraints>
                             <children>
@@ -154,77 +174,67 @@
                                        text="Процент стопа:" />
                                 <Label fx:id="stopPercentageLabel"
                                        style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;"
-                                       text="0.0%"
-                                       GridPane.columnIndex="1" />
+                                       text="0.0%" GridPane.columnIndex="1" />
 
                                 <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
                                        text="Количество монет:" GridPane.rowIndex="1" />
                                 <Label fx:id="coinQuantityLabel"
                                        style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;"
-                                       text="0.00 монет"
-                                       GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                       text="0.00 монет" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
                                 <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
                                        text="Сумма риска:" GridPane.rowIndex="2" />
                                 <Label fx:id="riskAmountLabel"
                                        style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;"
-                                       text="0.00 $"
-                                       GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                       text="0.00 $" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                                 <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
                                        text="Размер позиции:" GridPane.rowIndex="3" />
                                 <Label fx:id="positionSizeLabel"
                                        style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;"
-                                       text="0.00 $"
-                                       GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                       text="0.00 $" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                             </children>
                         </GridPane>
+
+                        <!-- Кнопки действий -->
+                        <HBox spacing="12.0" alignment="CENTER">
+                            <children>
+                                <Button fx:id="calculateButton"
+                                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 12 24 12 24;"
+                                        text="🧮 Рассчитать" />
+
+                                <Button fx:id="clearButton"
+                                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 12 24 12 24;"
+                                        text="🗑️ Очистить" />
+
+                                <Button fx:id="copyResultButton"
+                                        style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 12 24 12 24;"
+                                        text="📋 Копировать" />
+                            </children>
+                        </HBox>
                     </children>
                     <padding>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
                 </VBox>
 
-                <!-- Кнопки действий -->
-                <HBox spacing="16.0" alignment="CENTER"
-                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
-                    <children>
-                        <Button fx:id="calculateButton" onAction="#calculatePosition" prefWidth="150.0" prefHeight="45.0"
-                                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-cursor: hand;"
-                                text="Рассчитать" />
-
-                        <Button fx:id="clearButton" onAction="#clearAllFields" prefWidth="120.0" prefHeight="45.0"
-                                style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-cursor: hand;"
-                                text="Очистить" />
-
-                        <Button fx:id="copyResultButton" onAction="#copyResultsToClipboard" prefWidth="140.0" prefHeight="45.0"
-                                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-cursor: hand;"
-                                text="Копировать" />
-                    </children>
-                    <padding>
-                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                    </padding>
-                </HBox>
-
-                <!-- Описание расчета -->
-                <VBox spacing="16.0"
+                <!-- Детальное описание -->
+                <VBox spacing="12.0"
                       style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
                     <children>
                         <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
-                               text="Детали расчета" />
+                               text="📝 Описание расчета" />
 
-                        <TextArea fx:id="descriptionArea" editable="false" wrapText="true" prefHeight="120.0"
-                                  style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 13px; -fx-font-family: 'Segoe UI', Arial, sans-serif;"
-                                  promptText="Здесь будет показано подробное описание расчета..." />
+                        <TextArea fx:id="descriptionArea" editable="false" prefRowCount="8" wrapText="true"
+                                  style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 13px; -fx-font-family: 'Consolas', 'Monaco', monospace;" />
                     </children>
                     <padding>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
                 </VBox>
-
             </children>
             <padding>
-                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </padding>
         </VBox>
     </content>

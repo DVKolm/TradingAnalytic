@@ -141,7 +141,7 @@ tasks.jpackage {
     dependsOn("bootJar")
 
     appName = "Trading Analytics"
-    appVersion = "1.0.0"
+    appVersion = "1.0.3"
     vendor = "Trading Analytics"
     appDescription = "Trading Analytics"
     input = layout.buildDirectory.dir("libs").get().asFile.absolutePath

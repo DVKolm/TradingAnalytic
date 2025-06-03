@@ -170,35 +170,6 @@
                         </VBox>
                     </children>
                 </VBox>
-
-                <!-- Полезные советы -->
-                <VBox spacing="20.0">
-                    <children>
-                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
-                               text="💡 Совет дня" />
-
-                        <VBox spacing="16.0"
-                              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2); -fx-padding: 24;">
-                            <children>
-                                <HBox spacing="16.0" alignment="CENTER_LEFT">
-                                    <children>
-                                        <Label style="-fx-font-size: 32px;" text="🎯" />
-                                        <VBox spacing="8.0" HBox.hgrow="ALWAYS">
-                                            <children>
-                                                <Label fx:id="tipTitleLabel"
-                                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
-                                                       text="Ведите подробные записи" />
-                                                <Label fx:id="tipContentLabel" wrapText="true"
-                                                       style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d; -fx-line-spacing: 2px;"
-                                                       text="Записывайте не только цены входа и выхода, но и причины принятия решений. Это поможет вам анализировать свои ошибки и улучшать торговую стратегию." />
-                                            </children>
-                                        </VBox>
-                                    </children>
-                                </HBox>
-                            </children>
-                        </VBox>
-                    </children>
-                </VBox>
             </children>
             <padding>
                 <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />

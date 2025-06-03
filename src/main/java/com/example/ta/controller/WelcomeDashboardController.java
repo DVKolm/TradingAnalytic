@@ -41,41 +41,8 @@ public class WelcomeDashboardController implements Initializable {
 
     @FXML private VBox recentTradesContainer;
 
-    @FXML private Label tipTitleLabel;
-    @FXML private Label tipContentLabel;
-
     private final TradeService tradeService;
     private final ApplicationEventPublisher eventPublisher;
-
-    private Timeline tipRotationTimer;
-    private int currentTipIndex = 0;
-
-    private final List<TradingTip> tradingTips = Arrays.asList(
-            new TradingTip(
-                    "Ведите подробные записи",
-                    "Записывайте не только цены входа и выхода, но и причины принятия решений. Это поможет вам анализировать свои ошибки и улучшать торговую стратегию."
-            ),
-            new TradingTip(
-                    "Управляйте рисками",
-                    "Никогда не рискуйте более чем 2-3% от вашего капитала в одной сделке. Хорошее управление рисками важнее прибыльности отдельных сделок."
-            ),
-            new TradingTip(
-                    "Анализируйте свою статистику",
-                    "Регулярно просматривайте свою торговую статистику. Выявляйте закономерности в успешных и неуспешных сделках."
-            ),
-            new TradingTip(
-                    "Не торгуйте на эмоциях",
-                    "Эмоциональные решения часто приводят к убыткам. Всегда следуйте своему торговому плану и стратегии."
-            ),
-            new TradingTip(
-                    "Изучайте рынок постоянно",
-                    "Финансовые рынки постоянно меняются. Уделяйте время изучению новых инструментов и стратегий."
-            ),
-            new TradingTip(
-                    "Диверсифицируйте портфель",
-                    "Не концентрируйте все средства в одном активе или секторе. Распределение рисков поможет сохранить капитал."
-            )
-    );
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -86,8 +53,6 @@ public class WelcomeDashboardController implements Initializable {
         loadQuickStatistics();
 
         loadRecentTrades();
-
-        setupTipRotation();
 
         log.info("WelcomeDashboardController инициализирован");
     }
@@ -232,23 +197,6 @@ public class WelcomeDashboardController implements Initializable {
         return tradeBox;
     }
 
-    private void setupTipRotation() {
-        showCurrentTip();
-
-        tipRotationTimer = new Timeline(new KeyFrame(Duration.seconds(10), e -> {
-            currentTipIndex = (currentTipIndex + 1) % tradingTips.size();
-            showCurrentTip();
-        }));
-        tipRotationTimer.setCycleCount(Timeline.INDEFINITE);
-        tipRotationTimer.play();
-    }
-
-    private void showCurrentTip() {
-        TradingTip currentTip = tradingTips.get(currentTipIndex);
-        tipTitleLabel.setText(currentTip.getTitle());
-        tipContentLabel.setText(currentTip.getContent());
-    }
-
     // Быстрые действия
     @FXML
     private void quickAddTrade() {
@@ -272,30 +220,5 @@ public class WelcomeDashboardController implements Initializable {
     private void viewAllTrades() {
         log.info("Просмотр всех сделок");
         eventPublisher.publishEvent(new NavigationEvent(NavigationEvent.NavigationType.VIEW_TRADES));
-    }
-
-    public void shutdown() {
-        if (tipRotationTimer != null) {
-            tipRotationTimer.stop();
-        }
-        log.info("WelcomeDashboardController завершен");
-    }
-
-    private static class TradingTip {
-        private final String title;
-        private final String content;
-
-        public TradingTip(String title, String content) {
-            this.title = title;
-            this.content = content;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getContent() {
-            return content;
-        }
     }
 }
