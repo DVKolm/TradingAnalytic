@@ -16,6 +16,16 @@
                         <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
                                text="📈 Trading Analytics" />
                         <Region HBox.hgrow="ALWAYS" />
+
+                        <!-- Быстрый доступ к настройкам Telegram -->
+                        <Button fx:id="telegramQuickButton" onAction="#showTelegramSettings"
+                                style="-fx-background-color: #f8f9fa; -fx-text-fill: #6c757d; -fx-font-size: 11px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-cursor: hand; -fx-padding: 6 10 6 10; -fx-border-width: 1;"
+                                text="📱" />
+
+                        <Button fx:id="refreshButton" onAction="#refreshCurrentView"
+                                style="-fx-background-color: #f8f9fa; -fx-text-fill: #6c757d; -fx-font-size: 11px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-cursor: hand; -fx-padding: 6 10 6 10; -fx-border-width: 1;"
+                                text="🔄" />
+
                         <Label fx:id="currentTimeLabel"
                                style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d; -fx-font-weight: 500;"
                                text="01.01.2024 12:00:00" />
@@ -47,24 +57,15 @@
 
                                 <Button fx:id="positionCalculatorButton" onAction="#showPositionCalculator"
                                         style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 16 12 16;"
-                                        text="Калькулятор" />
+                                        text="📊 Калькулятор" />
+
                                 <Button fx:id="averagingCalculatorButton" onAction="#showAveragingCalculator"
                                         style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 16 12 16;"
-                                        text="Усреднение позиции" />
-
+                                        text="📈 Усреднение" />
                             </children>
                         </HBox>
 
                         <Region HBox.hgrow="ALWAYS" />
-
-                        <!-- Кнопка обновления в отдельном контейнере -->
-                        <HBox style="-fx-background-color: #f8f9fa; -fx-background-radius: 16; -fx-padding: 6;">
-                            <children>
-                                <Button fx:id="refreshButton" onAction="#refreshCurrentView"
-                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;"
-                                        text="🔄 Обновить" />
-                            </children>
-                        </HBox>
                     </children>
                 </HBox>
             </children>
@@ -89,6 +90,15 @@
 
                 <HBox spacing="16.0" alignment="CENTER_RIGHT">
                     <children>
+                        <!-- Статус Telegram - новый элемент -->
+                        <Label fx:id="telegramStatusLabel"
+                               style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: 500;"
+                               text="📱 Telegram: ⚙️ Не настроено" />
+
+                        <Separator orientation="VERTICAL"
+                                   style="-fx-background-color: #e9ecef;"
+                                   prefHeight="16.0" />
+
                         <Label fx:id="userInfoLabel"
                                style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: 500;"
                                text="👤 Пользователь: Трейдер" />
@@ -99,7 +109,7 @@
 
                         <Label fx:id="versionLabel"
                                style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: 500;"
-                               text="📱 Версия: 1.0.3" />
+                               text="📱 Версия: 1.0.4" />
                     </children>
                 </HBox>
             </children>

@@ -27,22 +27,58 @@ import java.util.stream.Collectors;
 public class TradeService {
 
     private final TradeRepository tradeRepository;
+    private final TelegramNotificationService telegramNotificationService;
 
     public Trade save(Trade trade) {
         log.info("Сохранение сделки: {}", trade.getAssetName());
 
+        boolean isNewTrade = trade.getId() == null;
         autoSetStatusBasedOnExitTime(trade);
 
-        return tradeRepository.save(trade);
+        Trade savedTrade = tradeRepository.save(trade);
+
+        // Безопасная отправка уведомления (только если настроено)
+        if (isNewTrade) {
+            safelySendTelegramNotification(savedTrade, "open");
+        }
+
+        return savedTrade;
     }
 
     public Trade update(Trade trade) {
         log.info("Обновление сделки: {}", trade.getAssetName());
 
-        autoSetStatusBasedOnExitTime(trade);
+        TradeStatus oldStatus = null;
+        if (trade.getId() != null) {
+            Optional<Trade> existingTrade = tradeRepository.findById(trade.getId());
+            oldStatus = existingTrade.map(Trade::getStatus).orElse(null);
+        }
 
-        return tradeRepository.save(trade);
+        autoSetStatusBasedOnExitTime(trade);
+        Trade savedTrade = tradeRepository.save(trade);
+
+        // Безопасная отправка уведомления при изменении статуса
+        if (oldStatus != TradeStatus.CLOSED && savedTrade.getStatus() == TradeStatus.CLOSED) {
+            safelySendTelegramNotification(savedTrade, "close");
+        } else {
+            safelySendTelegramNotification(savedTrade, "update");
+        }
+
+        return savedTrade;
     }
+
+
+    private void safelySendTelegramNotification(Trade trade, String action) {
+        try {
+            if (telegramNotificationService != null) {
+                telegramNotificationService.sendTradeNotification(trade, action);
+            }
+        } catch (Exception e) {
+            log.warn("Не удалось отправить Telegram уведомление для сделки {}: {}",
+                    trade.getAssetName(), e.getMessage());
+        }
+    }
+
 
     @Transactional(readOnly = true)
     public Optional<Trade> findById(Long id) {

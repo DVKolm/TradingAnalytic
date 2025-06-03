@@ -20,3 +20,8 @@ logging:
   level:
     root: INFO
     com.example.ta: DEBUG
+
+telegram:
+  news:
+    message-lifetime-hours: 3
+    cleanup-interval: "0 */5 * * * ?" # Очистка каждый 5 минут

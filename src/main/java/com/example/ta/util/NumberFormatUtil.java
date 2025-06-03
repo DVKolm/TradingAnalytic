@@ -13,16 +13,16 @@ public class NumberFormatUtil {
 
     /**
      * Форматирует число с разделителем тысяч (пробелы) и символом валюты
-     * Например: 1 234 567.89 $
+     * Например: 1 234 567,89 $
      */
     public static String formatCurrencyWithSpaces(BigDecimal value) {
         if (value == null) {
-            return "0.00 $";
+            return "0,00 $";
         }
 
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
         symbols.setGroupingSeparator(' '); // Используем пробел как разделитель тысяч
-        symbols.setDecimalSeparator('.');   // Точка как разделитель дробной части
+        symbols.setDecimalSeparator(',');   // Запятая как разделитель дробной части
 
         DecimalFormat formatter = new DecimalFormat("#,##0.00", symbols);
         return formatter.format(value) + " $";
@@ -30,16 +30,16 @@ public class NumberFormatUtil {
 
     /**
      * Форматирует число с разделителем тысяч (пробелы) без символа валюты
-     * Например: 1 234 567.89
+     * Например: 1 234 567,89
      */
     public static String formatNumberWithSpaces(BigDecimal value) {
         if (value == null) {
-            return "0.00";
+            return "0,00";
         }
 
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
         symbols.setGroupingSeparator(' '); // Используем пробел как разделитель тысяч
-        symbols.setDecimalSeparator('.');   // Точка как разделитель дробной части
+        symbols.setDecimalSeparator(',');   // Запятая как разделитель дробной части
 
         DecimalFormat formatter = new DecimalFormat("#,##0.00", symbols);
         return formatter.format(value);
@@ -47,7 +47,7 @@ public class NumberFormatUtil {
 
     /**
      * Форматирует число с указанным количеством знаков после запятой
-     * Например: formatNumber(123456.789, 2) = "123 456.79"
+     * Например: formatNumber(123456.789, 2) = "123 456,79"
      *
      * @param value число для форматирования
      * @param decimalPlaces количество знаков после запятой
@@ -55,12 +55,12 @@ public class NumberFormatUtil {
      */
     public static String formatNumber(BigDecimal value, int decimalPlaces) {
         if (value == null) {
-            return "0." + "0".repeat(Math.max(0, decimalPlaces));
+            return "0," + "0".repeat(Math.max(0, decimalPlaces));
         }
 
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
         symbols.setGroupingSeparator(' '); // Используем пробел как разделитель тысяч
-        symbols.setDecimalSeparator('.');   // Точка как разделитель дробной части
+        symbols.setDecimalSeparator(',');   // Запятая как разделитель дробной части
 
         // Создаем шаблон с нужным количеством знаков после запятой
         StringBuilder pattern = new StringBuilder("#,##0");
@@ -86,13 +86,35 @@ public class NumberFormatUtil {
     }
 
     /**
-     * Форматирует процент с одним знаком после запятой
-     * Например: 75.5%
+     * Форматирует процент с двумя знаками после запятой
+     * Например: 75,18%
      */
     public static String formatPercentage(BigDecimal value) {
         if (value == null) {
-            return "0.0%";
+            return "0,00%";
         }
-        return String.format("%.1f%%", value);
+
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
+        symbols.setDecimalSeparator(',');   // Запятая как разделитель дробной части
+
+        DecimalFormat formatter = new DecimalFormat("0.00", symbols);
+        return formatter.format(value) + "%";
+    }
+
+    /**
+     * Форматирует валюту для Telegram сообщений (без пробела перед $)
+     * Например: $1 234,56
+     */
+    public static String formatTelegramCurrency(BigDecimal value) {
+        if (value == null) {
+            return "$0,00";
+        }
+
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
+        symbols.setGroupingSeparator(' '); // Используем пробел как разделитель тысяч
+        symbols.setDecimalSeparator(',');   // Запятая как разделитель дробной части
+
+        DecimalFormat formatter = new DecimalFormat("#,##0.00", symbols);
+        return "$" + formatter.format(value);
     }
 }

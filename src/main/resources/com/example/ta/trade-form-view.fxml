@@ -95,38 +95,46 @@
                                 <ColumnConstraints hgrow="ALWAYS" minWidth="250.0" prefWidth="300.0" />
                             </columnConstraints>
                             <children>
+                                <!-- ROW 0: Цена входа -->
                                 <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
-                                       text="Цена входа*:" />
+                                       text="Цена входа*:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                                 <TextField fx:id="entryPointField"
                                            promptText="0.0000"
                                            style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
-                                           GridPane.columnIndex="1" />
+                                           GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
+                                <!-- ROW 1: Цель Take Profit -->
                                 <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
-                                       text="Цена выхода:" GridPane.rowIndex="1" />
-                                <TextField fx:id="exitPointField"
-                                           promptText="0.0000 (оставьте пустым для открытых сделок)"
+                                       text="Цель Take Profit:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                <TextField fx:id="takeProfitTargetField"
+                                           promptText="0.0000 (цель для взятия прибыли)"
                                            style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
                                            GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
+                                <!-- ROW 2: Цена выхода -->
                                 <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
-                                       text="Количество*:" GridPane.rowIndex="2" />
-                                <TextField fx:id="volumeField"
-                                           promptText="Количество единиц актива"
+                                       text="Цена выхода:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                <TextField fx:id="exitPointField"
+                                           promptText="0.0000 (оставьте пустым для открытых сделок)"
                                            style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
                                            GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
+                                <!-- ROW 3: Количество -->
                                 <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
-                                       text="Прибыль/Убыток:" GridPane.rowIndex="3" />
-                                <HBox spacing="10.0" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                    <children>
-                                        <TextField fx:id="profitLossField" prefWidth="200.0"
-                                                   promptText="0.00" editable="false"
-                                                   style="-fx-background-color: #e9ecef; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;" />
-                                        <Label style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"
-                                               text="(автоматически)" />
-                                    </children>
-                                </HBox>
+                                       text="Количество*:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                <TextField fx:id="volumeField"
+                                           promptText="Количество единиц актива"
+                                           style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                                <!-- ROW 4: Прибыль/Убыток -->
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
+                                       text="Прибыль/Убыток:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                <TextField fx:id="profitLossField"
+                                           promptText="0.00 (рассчитывается автоматически)"
+                                           editable="false"
+                                           style="-fx-background-color: #e9ecef; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="4" />
                             </children>
                         </GridPane>
                     </children>
@@ -134,6 +142,7 @@
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
                 </VBox>
+
 
                 <!-- Время сделки -->
                 <VBox spacing="16.0"
@@ -253,6 +262,8 @@
                                        text="• Прибыль/Убыток рассчитывается автоматически" />
                                 <Label style="-fx-font-size: 12px; -fx-text-fill: #34495e;"
                                        text="• Время в формате: дд.мм.гггг чч:мм" />
+                                <Label style="-fx-font-size: 12px; -fx-text-fill: #34495e;"
+                                       text="• Цель Take Profit показывает потенциальную прибыль при наведении" />
                             </children>
                         </VBox>
                     </children>

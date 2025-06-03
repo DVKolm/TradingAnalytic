@@ -76,7 +76,12 @@ dependencies {
     }
     implementation("net.synedra:validatorfx:0.5.0") {
         exclude(group = "org.openjfx")
+
     }
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
+    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
+// Если используете старые javax аннотации
+    implementation("javax.xml.bind:jaxb-api:2.3.1")
     implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
     implementation("org.kordamp.ikonli:ikonli-fontawesome5-pack:12.3.1")
     implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.1")
@@ -88,6 +93,9 @@ dependencies {
         exclude(group = "org.openjfx")
         exclude(group = "org.jetbrains.kotlin")
     }
+
+    implementation("org.telegram:telegrambots:6.8.0")
+    implementation("org.telegram:telegrambotsextensions:6.8.0")
 
     // DB
     implementation("org.xerial:sqlite-jdbc:$sqliteVersion")
@@ -106,6 +114,9 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.apache.commons:commons-lang3")
     implementation("commons-io:commons-io:2.16.1")
+
+    implementation("org.jsoup:jsoup:1.17.2")
+
 
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -141,7 +152,7 @@ tasks.jpackage {
     dependsOn("bootJar")
 
     appName = "Trading Analytics"
-    appVersion = "1.0.3"
+    appVersion = "1.0.4"
     vendor = "Trading Analytics"
     appDescription = "Trading Analytics"
     input = layout.buildDirectory.dir("libs").get().asFile.absolutePath
