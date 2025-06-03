@@ -3,7 +3,6 @@ spring:
     name: Trading Analytics
 
   datasource:
-    # Используем путь БЕЗ подпапок - прямо в домашней папке
     url: jdbc:sqlite:${user.home}/myapp.db
     driver-class-name: org.sqlite.JDBC
 

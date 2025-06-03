@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.ta.controller.AveragingCalculatorController"
+            fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            style="-fx-background-color: #f8f9fa; -fx-border-color: transparent;">
+
+    <content>
+        <VBox spacing="24.0" style="-fx-background-color: #f8f9fa;">
+            <children>
+                <!-- Заголовок -->
+                <VBox alignment="CENTER" spacing="8.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                               text="🎯 Расчет объемов для получения желаемой ТВХ" />
+                        <Label style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"
+                               text="Выберите тип позиции и укажите параметры — получите точные объемы для входа в каждой точке" />
+
+                        <Separator style="-fx-background-color: #ecf0f1;" />
+                    </children>
+                    <padding>
+                        <Insets bottom="16.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+
+                <!-- Выбор типа сделки -->
+                <VBox spacing="16.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+                               text="⚡ Тип позиции" />
+
+                        <HBox spacing="24.0" alignment="CENTER_LEFT">
+                            <children>
+                                <RadioButton fx:id="longRadioButton" style="-fx-font-size: 14px; -fx-font-weight: bold;"
+                                             text="🟢 LONG (покупка)" selected="true">
+                                    <toggleGroup>
+                                        <ToggleGroup fx:id="tradeTypeToggleGroup" />
+                                    </toggleGroup>
+                                </RadioButton>
+
+                                <RadioButton fx:id="shortRadioButton" style="-fx-font-size: 14px; -fx-font-weight: bold;"
+                                             text="🔴 SHORT (продажа)" toggleGroup="$tradeTypeToggleGroup" />
+                            </children>
+                        </HBox>
+
+                        <!-- Информация о выбранном типе -->
+                        <VBox spacing="6.0" style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 12;">
+                            <children>
+                                <Label fx:id="tradeTypeInfoLabel" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"
+                                       text="🟢 LONG позиция — покупаем актив, ожидаем рост цены" />
+                                <Label fx:id="stopInfoLabel" style="-fx-font-size: 12px; -fx-text-fill: #e67e22; -fx-font-weight: 600;"
+                                       text="🛑 Стоп-лосс должен быть НИЖЕ цен входов" />
+                                <Label fx:id="profitInfoLabel" style="-fx-font-size: 12px; -fx-text-fill: #3498db; -fx-font-weight: 600;"
+                                       text="📈 Прибыль при росте цены выше ТВХ" />
+                            </children>
+                        </VBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+
+                <!-- Входные параметры -->
+                <VBox spacing="16.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+                               text="📊 Входные параметры" />
+
+                        <GridPane hgap="20.0" vgap="16.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="220.0" minWidth="220.0" prefWidth="220.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="250.0" prefWidth="300.0" />
+                            </columnConstraints>
+                            <children>
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
+                                       text="💰 Сумма депозита (USDT):" />
+                                <TextField fx:id="depositField"
+                                           promptText="1000.00"
+                                           style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
+                                           GridPane.columnIndex="1" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
+                                       text="🛑 Процент стопа (%):" GridPane.rowIndex="1" />
+                                <TextField fx:id="stopPercentField"
+                                           promptText="2.0"
+                                           style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
+                                       text="🎯 Желаемая ТВХ (USDT):" GridPane.rowIndex="2" />
+                                <TextField fx:id="desiredAvgPriceField"
+                                           promptText="104400.00"
+                                           style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
+                                       text="📉 Цена стопа (USDT):" GridPane.rowIndex="3" />
+                                <TextField fx:id="stopPriceField"
+                                           promptText="103500.00"
+                                           style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10; -fx-font-size: 14px;"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                            </children>
+                        </GridPane>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+
+                <!-- Точки входа -->
+                <VBox spacing="16.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+                               text="📈 Точки входа и рассчитанные объемы" />
+
+                        <GridPane hgap="20.0" vgap="16.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="120.0" prefWidth="150.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="80.0" prefWidth="100.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="150.0" prefWidth="180.0" />
+                            </columnConstraints>
+                            <children>
+                                <!-- Заголовки -->
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 12px;"
+                                       text="" />
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 12px; -fx-alignment: center;"
+                                       text="Цена входа" GridPane.columnIndex="1" />
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 12px; -fx-alignment: center;"
+                                       text="Вес (%)" GridPane.columnIndex="2" />
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 12px; -fx-alignment: center;"
+                                       text="ОБЪЕМ ДЛЯ ВХОДА" GridPane.columnIndex="3" />
+
+                                <!-- Первая точка входа -->
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #3498db; -fx-font-size: 14px;"
+                                       text="1-я точка входа:" GridPane.rowIndex="1" />
+                                <TextField fx:id="entryPrice1Field"
+                                           promptText="104586.00"
+                                           style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 13px;"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <Label fx:id="weight1Label"
+                                       style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #3498db; -fx-alignment: center; -fx-background-color: #ecf0f1; -fx-background-radius: 6; -fx-padding: 6;"
+                                       text="0.0%" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                <Label fx:id="volume1Label"
+                                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-alignment: center;"
+                                       text="0.00 USDT" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                                <!-- Вторая точка входа -->
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #f39c12; -fx-font-size: 14px;"
+                                       text="2-я точка входа:" GridPane.rowIndex="2" />
+                                <TextField fx:id="entryPrice2Field"
+                                           promptText="104396.00"
+                                           style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 13px;"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <Label fx:id="weight2Label"
+                                       style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #f39c12; -fx-alignment: center; -fx-background-color: #ecf0f1; -fx-background-radius: 6; -fx-padding: 6;"
+                                       text="0.0%" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                <Label fx:id="volume2Label"
+                                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-alignment: center;"
+                                       text="0.00 USDT" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+
+                                <!-- Третья точка входа -->
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #e74c3c; -fx-font-size: 14px;"
+                                       text="3-я точка входа:" GridPane.rowIndex="3" />
+                                <TextField fx:id="entryPrice3Field"
+                                           promptText="104058.00"
+                                           style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 13px;"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                <Label fx:id="weight3Label"
+                                       style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #e74c3c; -fx-alignment: center; -fx-background-color: #ecf0f1; -fx-background-radius: 6; -fx-padding: 6;"
+                                       text="0.0%" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                <Label fx:id="volume3Label"
+                                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-alignment: center;"
+                                       text="0.00 USDT" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+
+                                <!-- Итого -->
+                                <Separator style="-fx-background-color: #ecf0f1;" GridPane.columnSpan="4" GridPane.rowIndex="4" />
+
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-size: 14px;"
+                                       text="ИТОГО:" GridPane.rowIndex="5" />
+                                <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-alignment: center;"
+                                       text="100%" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                <Label fx:id="totalVolumeLabel"
+                                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-alignment: center;"
+                                       text="0.00 USDT" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                            </children>
+                        </GridPane>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+
+                <!-- Результаты расчетов -->
+                <VBox spacing="16.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+                               text="📊 Результаты расчета" />
+
+                        <GridPane hgap="20.0" vgap="16.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="220.0" minWidth="220.0" prefWidth="220.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="250.0" prefWidth="300.0" />
+                            </columnConstraints>
+                            <children>
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
+                                       text="🎯 Фактическая ТВХ:" />
+                                <Label fx:id="calculatedAvgPriceLabel"
+                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #3498db;"
+                                       text="0.00 USDT" GridPane.columnIndex="1" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
+                                       text="🪙 Общее количество монет:" GridPane.rowIndex="1" />
+                                <Label fx:id="totalCoinsLabel"
+                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"
+                                       text="0.000000" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
+                                       text="💸 Максимальная потеря:" GridPane.rowIndex="2" />
+                                <Label fx:id="maxLossAmountLabel"
+                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;"
+                                       text="0.00 USDT" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #34495e; -fx-font-size: 14px;"
+                                       text="📊 Фактический риск:" GridPane.rowIndex="3" />
+                                <Label fx:id="actualRiskPercentLabel"
+                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #9b59b6;"
+                                       text="0.0%" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                            </children>
+                        </GridPane>
+
+                        <!-- Кнопки действий -->
+                        <HBox spacing="12.0" alignment="CENTER">
+                            <children>
+                                <Button fx:id="calculateButton"
+                                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 12 24 12 24;"
+                                        text="Рассчитать объемы" />
+
+                                <Button fx:id="clearButton"
+                                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 12 24 12 24;"
+                                        text="Очистить" />
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+            </children>
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+        </VBox>
+    </content>
+</ScrollPane>

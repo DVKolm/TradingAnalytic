@@ -48,6 +48,10 @@
                                 <Button fx:id="positionCalculatorButton" onAction="#showPositionCalculator"
                                         style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 16 12 16;"
                                         text="Калькулятор" />
+                                <Button fx:id="averagingCalculatorButton" onAction="#showAveragingCalculator"
+                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 16 12 16;"
+                                        text="Усреднение позиции" />
+
                             </children>
                         </HBox>
 
@@ -95,7 +99,7 @@
 
                         <Label fx:id="versionLabel"
                                style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: 500;"
-                               text="📱 Версия: 1.0.0" />
+                               text="📱 Версия: 1.0.3" />
                     </children>
                 </HBox>
             </children>

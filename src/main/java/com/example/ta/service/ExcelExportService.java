@@ -1,3 +1,4 @@
+
 package com.example.ta.service;
 
 import com.example.ta.domain.Trade;
@@ -14,7 +15,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -24,6 +30,8 @@ import java.util.List;
 public class ExcelExportService {
 
     private final TradeService tradeService;
+    private static final int MAX_RETRY_ATTEMPTS = 5;
+    private static final long RETRY_DELAY_MS = 1000;
 
     /**
      * Экспорт статистики торговли в Excel
@@ -39,12 +47,122 @@ public class ExcelExportService {
             List<Trade> trades = tradeService.getClosedTradesForPeriod(startDate, endDate);
             createTradesSheet(tradesSheet, trades, workbook);
 
-            File file = createExcelFile(workbook, statistics);
+            File file = createExcelFileWithRetry(workbook, statistics);
 
             log.info("Excel отчет успешно создан: {}", file.getAbsolutePath());
             return file;
         }
     }
+
+    /**
+     * Создание файла Excel с повторными попытками при блокировке
+     */
+    private File createExcelFileWithRetry(Workbook workbook, TradeStatistics statistics) throws IOException {
+        IOException lastException = null;
+
+        for (int attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
+            try {
+                return createExcelFileSecure(workbook, statistics, attempt);
+            } catch (IOException e) {
+                lastException = e;
+                log.warn("Попытка {} из {} неудачна: {}", attempt, MAX_RETRY_ATTEMPTS, e.getMessage());
+
+                if (attempt < MAX_RETRY_ATTEMPTS) {
+                    try {
+                        log.info("Ожидание {} мс перед следующей попыткой...", RETRY_DELAY_MS);
+                        Thread.sleep(RETRY_DELAY_MS);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new IOException("Процесс создания файла прерван", ie);
+                    }
+                }
+            }
+        }
+
+        throw new IOException("Не удалось создать Excel файл после " + MAX_RETRY_ATTEMPTS + " попыток", lastException);
+    }
+
+
+    /**
+     * Безопасное создание файла Excel с проверкой блокировки
+     */
+    private File createExcelFileSecure(Workbook workbook, TradeStatistics statistics, int attempt) throws IOException {
+        String fileName = generateFileName(statistics);
+        Path filePath = Path.of(System.getProperty("user.home"), fileName);
+
+        // Если файл существует и это не первая попытка, создаем уникальное имя
+        if (Files.exists(filePath) && attempt > 1) {
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH_mm_ss"));
+            String baseFileName = fileName.substring(0, fileName.lastIndexOf('.'));
+            String extension = fileName.substring(fileName.lastIndexOf('.'));
+            fileName = baseFileName + "_" + timestamp + extension;
+            filePath = Path.of(System.getProperty("user.home"), fileName);
+        }
+
+        // Если файл все еще существует, пытаемся его удалить
+        if (Files.exists(filePath)) {
+            try {
+                log.info("Файл {} уже существует, попытка удаления...", filePath);
+                Files.delete(filePath);
+            } catch (IOException e) {
+                log.warn("Не удалось удалить существующий файл: {}: {}", filePath, e.getMessage());
+                // Создаем уникальное имя файла с временной меткой
+                String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH_mm_ss"));
+                String baseFileName = fileName.substring(0, fileName.lastIndexOf('.'));
+                String extension = fileName.substring(fileName.lastIndexOf('.'));
+                fileName = baseFileName + "_" + timestamp + extension;
+                filePath = Path.of(System.getProperty("user.home"), fileName);
+                log.info("Используем уникальное имя файла: {}", filePath);
+            }
+        }
+
+        File file = filePath.toFile();
+
+        // Используем try-with-resources для автоматического закрытия ресурсов
+        try (FileOutputStream fos = new FileOutputStream(file);
+             FileChannel channel = fos.getChannel()) {
+
+            // Получаем эксклюзивную блокировку файла
+            try (FileLock lock = channel.tryLock()) {
+                if (lock == null) {
+                    throw new IOException("Не удалось заблокировать файл для записи: " + filePath);
+                }
+
+                log.info("Файл успешно заблокирован для записи: {}", filePath);
+
+                // Записываем workbook в поток
+                workbook.write(fos);
+                fos.flush(); // Принудительно сбрасываем буфер
+
+                log.info("Excel файл успешно создан: {}", filePath);
+                return file;
+            }
+        } catch (IOException e) {
+            // Пытаемся удалить частично созданный файл
+            try {
+                if (Files.exists(filePath)) {
+                    Files.delete(filePath);
+                }
+            } catch (IOException deleteEx) {
+                log.warn("Не удалось удалить частично созданный файл: {}", filePath, deleteEx);
+            }
+            throw e;
+        }
+    }
+
+    private String generateFileName(TradeStatistics statistics) {
+        LocalDate now = LocalDate.now();
+        String dateStr = now.format(DateTimeFormatter.ofPattern("yyyy_MM_dd"));
+
+        if (statistics.getPeriodStart() != null && statistics.getPeriodEnd() != null) {
+            String startStr = statistics.getPeriodStart().format(DateTimeFormatter.ofPattern("yyyy_MM_dd"));
+            String endStr = statistics.getPeriodEnd().format(DateTimeFormatter.ofPattern("yyyy_MM_dd"));
+            return String.format("trading_statistics_%s_%s_%s.xlsx", startStr, endStr, dateStr);
+        } else {
+            return String.format("trading_statistics_all_time_%s.xlsx", dateStr);
+        }
+    }
+
 
     /**
      * Создание листа со статистикой
@@ -85,7 +203,7 @@ public class ExcelExportService {
         Cell headerCell = headerRow.createCell(0);
         headerCell.setCellValue("ОСНОВНЫЕ ПОКАЗАТЕЛИ");
         headerCell.setCellStyle(headerStyle);
-        sheet.addMergedRegion(new CellRangeAddress(rowNum-1, rowNum-1, 0, 1));
+        sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 1));
 
         addStatRow(sheet, rowNum++, "💼 Всего закрытых сделок",
                 NumberFormatUtil.formatIntegerWithSpaces(stats.getTotalTrades()), centeredDataStyle);
@@ -173,10 +291,8 @@ public class ExcelExportService {
      */
     private void setStatisticsColumnWidths(Sheet sheet) {
         sheet.setColumnWidth(0, 8000); // ~40 символов
-
         sheet.setColumnWidth(1, 4000); // ~20 символов
-
-        log.info("Установлена ширина колонок для листа статистики");
+        log.debug("Установлена ширина колонок для листа статистики");
     }
 
     /**
@@ -184,25 +300,15 @@ public class ExcelExportService {
      */
     private void setTradesColumnWidths(Sheet sheet) {
         int[] columnWidths = {
-                2500,
-                6000,
-                3500,
-                3500,
-                4000,
-                5500,
-                5500,
-                5500,
-                6000,
-                10000,
-                10000,
-                8000
+                2500, 6000, 3500, 3500, 4000, 5500,
+                5500, 5500, 6000, 10000, 10000, 8000
         };
 
         for (int i = 0; i < columnWidths.length; i++) {
             sheet.setColumnWidth(i, columnWidths[i]);
         }
 
-        log.info("Установлена расширенная ширина колонок для листа сделок с отформатированными числами");
+        log.debug("Установлена расширенная ширина колонок для листа сделок");
     }
 
     /**
@@ -231,23 +337,6 @@ public class ExcelExportService {
             cell.setCellValue("0.00 $");
         }
         cell.setCellStyle(style);
-    }
-
-    /**
-     * Создание файла Excel
-     */
-    private File createExcelFile(Workbook workbook, TradeStatistics statistics) throws IOException {
-        String fileName = String.format("trading_statistics_%s_%s.xlsx",
-                statistics.getPeriodType() != null ? statistics.getPeriodType().name().toLowerCase() : "custom",
-                LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd")));
-
-        File file = new File(System.getProperty("user.home"), fileName);
-
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-            workbook.write(outputStream);
-        }
-
-        return file;
     }
 
     private CellStyle createTitleStyle(Workbook workbook) {
@@ -290,38 +379,26 @@ public class ExcelExportService {
         return style;
     }
 
-    /**
-     * Создание стиля для центрированных данных в разделе статистики
-     */
     private CellStyle createCenteredDataStyle(Workbook workbook) {
         CellStyle style = createDataStyle(workbook);
         style.setAlignment(HorizontalAlignment.CENTER);
         return style;
     }
 
-    /**
-     * Создание стиля для текстовых ячеек с переносом строк
-     */
     private CellStyle createTextWrapStyle(Workbook workbook) {
         CellStyle style = createDataStyle(workbook);
-        style.setWrapText(true); // Включаем перенос текста
+        style.setWrapText(true);
         style.setAlignment(HorizontalAlignment.LEFT);
         style.setVerticalAlignment(VerticalAlignment.TOP);
         return style;
     }
 
-    /**
-     * Создание стиля для отформатированных валютных значений (как текст)
-     */
     private CellStyle createCurrencyFormattedStyle(Workbook workbook) {
         CellStyle style = createDataStyle(workbook);
         style.setAlignment(HorizontalAlignment.RIGHT);
         return style;
     }
 
-    /**
-     * Устаревший метод - оставлен для совместимости, но не используется
-     */
     private CellStyle createCurrencyStyle(Workbook workbook) {
         CellStyle style = createDataStyle(workbook);
         style.setDataFormat(workbook.createDataFormat().getFormat("$#,##0.00"));

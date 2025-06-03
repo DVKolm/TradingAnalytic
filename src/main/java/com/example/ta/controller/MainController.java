@@ -1,10 +1,10 @@
 package com.example.ta.controller;
 
-import com.example.ta.events.NavigationEvent;
 import com.example.ta.config.SpringFXMLLoader;
 import com.example.ta.domain.Trade;
-import javafx.animation.Timeline;
+import com.example.ta.events.NavigationEvent;
 import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -30,19 +30,32 @@ import java.util.ResourceBundle;
 @RequiredArgsConstructor
 public class MainController implements Initializable {
 
-    @FXML private Button homeButton;
-    @FXML private Button tradesListButton;
-    @FXML private Button addTradeButton;
-    @FXML private Button statisticsButton;
-    @FXML private Button positionCalculatorButton;
-    @FXML private Button refreshButton;
+    @FXML
+    private Button homeButton;
+    @FXML
+    private Button tradesListButton;
+    @FXML
+    private Button addTradeButton;
+    @FXML
+    private Button statisticsButton;
+    @FXML
+    private Button positionCalculatorButton;
+    @FXML
+    private Button averagingCalculatorButton;
+    @FXML
+    private Button refreshButton;
 
-    @FXML private StackPane contentArea;
+    @FXML
+    private StackPane contentArea;
 
-    @FXML private Label statusLabel;
-    @FXML private Label currentTimeLabel;
-    @FXML private Label versionLabel;
-    @FXML private Label userInfoLabel;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private Label currentTimeLabel;
+    @FXML
+    private Label versionLabel;
+    @FXML
+    private Label userInfoLabel;
 
     private final SpringFXMLLoader springFXMLLoader;
 
@@ -55,7 +68,9 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         log.info("Инициализация MainController");
 
-        navigationButtons = List.of(homeButton, tradesListButton, addTradeButton, statisticsButton, positionCalculatorButton);
+        // Добавляем новую кнопку в список навигационных кнопок
+        navigationButtons = List.of(homeButton, tradesListButton, addTradeButton,
+                statisticsButton, positionCalculatorButton, averagingCalculatorButton);
 
         setupButtonHoverEffects();
 
@@ -80,7 +95,7 @@ public class MainController implements Initializable {
             case VIEW_TRADES -> showTradesList();
             case STATISTICS -> showStatistics();
             case HOME -> showHome();
-            case POSITION_CALCULATOR -> showPositionCalculator(); // НОВЫЙ СЛУЧАЙ
+            case POSITION_CALCULATOR -> showPositionCalculator();
             case VIEW_TRADE_DETAILS -> showTradeDetails(event.getTrade());
             case EDIT_TRADE -> showEditTrade(event.getTrade());
         }
@@ -138,8 +153,8 @@ public class MainController implements Initializable {
         for (Button button : navigationButtons) {
             if (button == homeButton) continue;
 
-            String inactiveStyle = "-fx-background-color: #f8f9fa; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 0; -fx-border-color: #dee2e6; -fx-border-width: 0 1 0 0; -fx-cursor: hand;";
-            String hoverStyle = "-fx-background-color: #e9ecef; -fx-text-fill: #495057; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 0; -fx-border-color: #dee2e6; -fx-border-width: 0 1 0 0; -fx-cursor: hand;";
+            String inactiveStyle = "-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;";
+            String hoverStyle = "-fx-background-color: #e9ecef; -fx-text-fill: #495057; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;";
 
             button.setOnMouseEntered(e -> {
                 if (button != currentActiveButton) {
@@ -154,21 +169,23 @@ public class MainController implements Initializable {
             });
         }
 
+        // Специальные эффекты для кнопки "Главная"
         homeButton.setOnMouseEntered(e -> {
             if (homeButton != currentActiveButton) {
-                homeButton.setStyle("-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 0; -fx-border-color: transparent; -fx-cursor: hand;");
+                homeButton.setStyle("-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20; -fx-effect: dropshadow(gaussian, rgba(52,152,219,0.2), 4, 0, 0, 1);");
             }
         });
         homeButton.setOnMouseExited(e -> {
             if (homeButton != currentActiveButton) {
-                homeButton.setStyle("-fx-background-color: #f8f9fa; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 0; -fx-border-color: #dee2e6; -fx-border-width: 0 1 0 0; -fx-cursor: hand;");
+                homeButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;");
             }
         });
 
+        // Эффекты для кнопки обновления
         refreshButton.setOnMouseEntered(e ->
-                refreshButton.setStyle("-fx-background-color: #e9ecef; -fx-text-fill: #495057; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 0; -fx-border-color: #dee2e6; -fx-border-width: 0 0 0 1; -fx-cursor: hand;"));
+                refreshButton.setStyle("-fx-background-color: #e9ecef; -fx-text-fill: #495057; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;"));
         refreshButton.setOnMouseExited(e ->
-                refreshButton.setStyle("-fx-background-color: #f8f9fa; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 0; -fx-border-color: #dee2e6; -fx-border-width: 0 0 0 1; -fx-cursor: hand;"));
+                refreshButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;"));
     }
 
     private void setupTimeUpdater() {
@@ -185,8 +202,8 @@ public class MainController implements Initializable {
     }
 
     private void setActiveButton(Button activeButton) {
-        String inactiveStyle = "-fx-background-color: #f8f9fa; -fx-text-fill: #6c757d; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 0; -fx-border-color: #dee2e6; -fx-border-width: 0 1 0 0; -fx-cursor: hand;";
-        String activeStyle = "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 600; -fx-background-radius: 0; -fx-border-color: transparent; -fx-cursor: hand;";
+        String inactiveStyle = "-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;";
+        String activeStyle = "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20; -fx-effect: dropshadow(gaussian, rgba(52,152,219,0.2), 4, 0, 0, 1);";
 
         for (Button button : navigationButtons) {
             if (button == activeButton) {
@@ -251,6 +268,17 @@ public class MainController implements Initializable {
         updateStatus("Калькулятор позиции");
     }
 
+    /**
+     * Новый метод для отображения калькулятора усреднения
+     */
+    @FXML
+    private void showAveragingCalculator() {
+        log.info("Показываем калькулятор усреднения");
+        setActiveButton(averagingCalculatorButton);
+        loadContent("/com/example/ta/averaging-calculator.fxml");
+        updateStatus("Калькулятор усреднения позиции");
+    }
+
     @FXML
     private void refreshCurrentView() {
         log.info("Обновляем текущий вид");
@@ -266,6 +294,8 @@ public class MainController implements Initializable {
             showStatistics();
         } else if (currentActiveButton == positionCalculatorButton) {
             showPositionCalculator();
+        } else if (currentActiveButton == averagingCalculatorButton) {
+            showAveragingCalculator();
         }
 
         updateStatus("Контент обновлен");
@@ -290,6 +320,13 @@ public class MainController implements Initializable {
 
     public void navigateToPositionCalculator() {
         showPositionCalculator();
+    }
+
+    /**
+     * Новый публичный метод для навигации к калькулятору усреднения
+     */
+    public void navigateToAveragingCalculator() {
+        showAveragingCalculator();
     }
 
     public void updateStatusFromExternal(String message) {

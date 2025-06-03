@@ -1,3 +1,4 @@
+
 package com.example.ta.controller;
 
 import com.example.ta.domain.PositionCalculation;
@@ -20,11 +21,19 @@ import java.util.ResourceBundle;
 @RequiredArgsConstructor
 public class PositionCalculatorController implements Initializable {
 
+    @FXML private RadioButton longRadioButton;
+    @FXML private RadioButton shortRadioButton;
+    @FXML private ToggleGroup tradeTypeToggleGroup;
+
     @FXML private TextField depositField;
     @FXML private TextField riskField;
     @FXML private TextField entryPriceField;
     @FXML private TextField stopPriceField;
 
+    @FXML private Label autoStopDescription;
+    @FXML private Label stopLoss15TypeLabel;
+    @FXML private Label stopLoss25TypeLabel;
+    @FXML private Label stopLoss5TypeLabel;
     @FXML private Label stopLoss15Label;
     @FXML private Label stopLoss25Label;
     @FXML private Label stopLoss5Label;
@@ -50,8 +59,34 @@ public class PositionCalculatorController implements Initializable {
         log.info("Инициализация PositionCalculatorController");
         setupInputFields();
         setupButtons();
+        setupTradeTypeControls();
         clearResults();
         setupAutoStopLoss();
+    }
+
+    private void setupTradeTypeControls() {
+        // Настройка слушателей для переключения типа сделки
+        tradeTypeToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+            updateAutoStopLossLabels();
+            calculateAutoStopLosses();
+            autoCalculate();
+        });
+    }
+
+    private void updateAutoStopLossLabels() {
+        boolean isLong = longRadioButton.isSelected();
+
+        if (isLong) {
+            autoStopDescription.setText("Введите цену входа, и система автоматически рассчитает стоп-лоссы для Long позиций");
+            stopLoss15TypeLabel.setText("Агрессивный (-1.5%)");
+            stopLoss25TypeLabel.setText("Умеренный (-2.5%)");
+            stopLoss5TypeLabel.setText("Консервативный (-5%)");
+        } else {
+            autoStopDescription.setText("Введите цену входа, и система автоматически рассчитает стоп-лоссы для Short позиций");
+            stopLoss15TypeLabel.setText("Агрессивный (+1.5%)");
+            stopLoss25TypeLabel.setText("Умеренный (+2.5%)");
+            stopLoss5TypeLabel.setText("Консервативный (+5%)");
+        }
     }
 
     private void setupInputFields() {
@@ -113,10 +148,21 @@ public class PositionCalculatorController implements Initializable {
             }
 
             BigDecimal entryPrice = parseDecimal(entryPriceText);
+            boolean isLong = longRadioButton.isSelected();
 
-            BigDecimal stopLoss1_5 = entryPrice.multiply(BigDecimal.valueOf(0.985));
-            BigDecimal stopLoss2_5 = entryPrice.multiply(BigDecimal.valueOf(0.975));
-            BigDecimal stopLoss5_0 = entryPrice.multiply(BigDecimal.valueOf(0.95));
+            BigDecimal stopLoss1_5, stopLoss2_5, stopLoss5_0;
+
+            if (isLong) {
+                // Для Long позиций: стоп ниже цены входа
+                stopLoss1_5 = entryPrice.multiply(BigDecimal.valueOf(0.985)); // -1.5%
+                stopLoss2_5 = entryPrice.multiply(BigDecimal.valueOf(0.975)); // -2.5%
+                stopLoss5_0 = entryPrice.multiply(BigDecimal.valueOf(0.95));  // -5%
+            } else {
+                // Для Short позиций: стоп выше цены входа
+                stopLoss1_5 = entryPrice.multiply(BigDecimal.valueOf(1.015)); // +1.5%
+                stopLoss2_5 = entryPrice.multiply(BigDecimal.valueOf(1.025)); // +2.5%
+                stopLoss5_0 = entryPrice.multiply(BigDecimal.valueOf(1.05));  // +5%
+            }
 
             stopLoss15Label.setText(NumberFormatUtil.formatNumber(stopLoss1_5, 2));
             stopLoss25Label.setText(NumberFormatUtil.formatNumber(stopLoss2_5, 2));
@@ -130,7 +176,8 @@ public class PositionCalculatorController implements Initializable {
             stopLoss25Label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #f39c12;");
             stopLoss5Label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;");
 
-            log.debug("Рассчитаны автоматические стоп-лоссы для цены входа: {}", entryPrice);
+            log.debug("Рассчитаны автоматические стоп-лоссы для {} позиции с ценой входа: {}",
+                    isLong ? "Long" : "Short", entryPrice);
 
         } catch (Exception e) {
             log.debug("Ошибка при расчете автоматических стоп-лоссов: {}", e.getMessage());
@@ -149,14 +196,29 @@ public class PositionCalculatorController implements Initializable {
             }
 
             BigDecimal entryPrice = parseDecimal(entryPriceText);
-            BigDecimal multiplier = BigDecimal.valueOf((100 - percentage) / 100);
-            BigDecimal stopLoss = entryPrice.multiply(multiplier).setScale(2, RoundingMode.HALF_UP);
+            boolean isLong = longRadioButton.isSelected();
+
+            BigDecimal stopLoss;
+            String direction;
+
+            if (isLong) {
+                // Для Long позиций: стоп ниже цены входа
+                BigDecimal multiplier = BigDecimal.valueOf((100 - percentage) / 100);
+                stopLoss = entryPrice.multiply(multiplier).setScale(2, RoundingMode.HALF_UP);
+                direction = "Long";
+            } else {
+                // Для Short позиций: стоп выше цены входа
+                BigDecimal multiplier = BigDecimal.valueOf((100 + percentage) / 100);
+                stopLoss = entryPrice.multiply(multiplier).setScale(2, RoundingMode.HALF_UP);
+                direction = "Short";
+            }
 
             stopPriceField.setText(stopLoss.toString());
 
-            log.info("Установлен автоматический стоп-лосс {}%: {}", percentage, stopLoss);
+            log.info("Установлен автоматический стоп-лосс {}% для {} позиции: {}",
+                    percentage, direction, stopLoss);
 
-            showQuickInfo(String.format("✅ Установлен стоп-лосс %.1f%%", percentage));
+            showQuickInfo(String.format("✅ Установлен стоп-лосс %.1f%% для %s позиции", percentage, direction));
 
         } catch (Exception e) {
             log.error("Ошибка при установке автоматического стоп-лосса", e);
@@ -265,8 +327,10 @@ public class PositionCalculatorController implements Initializable {
         riskField.clear();
         entryPriceField.clear();
         stopPriceField.clear();
+        longRadioButton.setSelected(true); // Возвращаем к Long по умолчанию
         clearResults();
         clearAutoStopLosses();
+        updateAutoStopLossLabels();
 
         log.info("Все поля очищены");
     }
@@ -274,8 +338,10 @@ public class PositionCalculatorController implements Initializable {
     @FXML
     private void copyResultsToClipboard() {
         try {
+            String tradeType = longRadioButton.isSelected() ? "Long" : "Short";
             String results = String.format(
                     "📊 РЕЗУЛЬТАТЫ РАСЧЕТА ПОЗИЦИИ\n\n" +
+                            "Тип сделки: %s\n" +
                             "Депозит: %s\n" +
                             "Риск: %s\n" +
                             "Вход: %s USDT\n" +
@@ -285,6 +351,7 @@ public class PositionCalculatorController implements Initializable {
                             "Сумма риска: %s\n" +
                             "Размер позиции: %s\n\n" +
                             "%s",
+                    tradeType,
                     depositField.getText() + " USDT",
                     riskField.getText() + "%",
                     entryPriceField.getText(),
