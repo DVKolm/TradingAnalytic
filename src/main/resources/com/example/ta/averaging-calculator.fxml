@@ -55,7 +55,7 @@
                                 <Label fx:id="tradeTypeInfoLabel" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"
                                        text="🟢 LONG позиция — покупаем актив, ожидаем рост цены" />
                                 <Label fx:id="stopInfoLabel" style="-fx-font-size: 12px; -fx-text-fill: #e67e22; -fx-font-weight: 600;"
-                                       text="🛑 Стоп-лосс должен быть НИЖЕ цен входов" />
+                                       text="🛑 Стоп-лосс должен быть ниже цены входа" />
                                 <Label fx:id="profitInfoLabel" style="-fx-font-size: 12px; -fx-text-fill: #3498db; -fx-font-weight: 600;"
                                        text="📈 Прибыль при росте цены выше ТВХ" />
                             </children>

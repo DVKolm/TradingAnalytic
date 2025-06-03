@@ -88,7 +88,7 @@ public class AveragingCalculatorController implements Initializable {
             tradeTypeInfoLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
         } else {
             tradeTypeInfoLabel.setText("🔴 SHORT позиция — продаем актив, ожидаем падение цены");
-            stopInfoLabel.setText("🛑 Стоп-лосс должен быть ВЫШЕ цен входов");
+            stopInfoLabel.setText("🛑 Стоп-лосс должен быть выше цены входа");
             profitInfoLabel.setText("📉 Прибыль при падении цены ниже ТВХ");
 
             tradeTypeInfoLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");

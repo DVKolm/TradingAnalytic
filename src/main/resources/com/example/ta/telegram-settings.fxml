@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.ta.controller.TelegramSettingsController"
+            style="-fx-background-color: #f8f9fa;">
+
+    <content>
+        <VBox spacing="24.0" style="-fx-padding: 32 24 32 24;">
+            <children>
+                <!-- Заголовок страницы -->
+                <VBox spacing="8.0">
+                    <children>
+                        <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                               text="📱 Настройки Telegram" />
+                        <Label style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"
+                               text="Настройте интеграцию с Telegram для получения уведомлений и новостной ленты" />
+                    </children>
+                </VBox>
+
+                <!-- Карточка с настройками подключения -->
+                <VBox spacing="16.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 24; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                               text="🔐 Подключение к боту" />
+
+                        <!-- Токен бота -->
+                        <VBox spacing="8.0">
+                            <children>
+                                <Label style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #495057;"
+                                       text="Токен бота:" />
+                                <TextField fx:id="botTokenField"
+                                           style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-padding: 12; -fx-font-size: 13px;"
+                                           promptText="Введите токен от @BotFather" />
+                                <Label style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"
+                                       text="💡 Получите токен у @BotFather в Telegram" />
+                            </children>
+                        </VBox>
+
+                        <!-- Chat ID -->
+                        <VBox spacing="8.0">
+                            <children>
+                                <Label style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #495057;"
+                                       text="ID чата/группы:" />
+                                <TextField fx:id="chatIdField"
+                                           style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-padding: 12; -fx-font-size: 13px;"
+                                           promptText="Например: -1001234567890" />
+                                <Label style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"
+                                       text="💡 Добавьте бота в группу и используйте команду /chatid" />
+                            </children>
+                        </VBox>
+
+                        <!-- Кнопка тестирования -->
+                        <HBox spacing="12.0" alignment="CENTER_LEFT">
+                            <children>
+                                <Button fx:id="testButton" onAction="#handleTest"
+                                        style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: 600; -fx-background-radius: 8; -fx-padding: 12 24 12 24; -fx-cursor: hand;"
+                                        text="🔍 Тестировать соединение" />
+                                <Label fx:id="statusLabel"
+                                       style="-fx-font-size: 13px; -fx-font-weight: 500;"
+                                       text="" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <!-- Карточка управления новостными каналами -->
+                <VBox spacing="16.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 24; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                               text="📰 Новостные каналы" />
+
+                        <!-- Форма добавления канала -->
+                        <VBox spacing="12.0">
+                            <children>
+                                <Label style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #495057;"
+                                       text="Добавить новый канал:" />
+
+                                <HBox spacing="12.0" alignment="CENTER_LEFT">
+                                    <children>
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"
+                                                       text="Username канала:" />
+                                                <TextField fx:id="newChannelUsernameField"
+                                                           style="-fx-background-color: #f8f9fa; -fx-background-radius: 6; -fx-border-color: #dee2e6; -fx-border-radius: 6; -fx-padding: 8; -fx-font-size: 12px;"
+                                                           promptText="crypto_news" />
+                                            </children>
+                                        </VBox>
+
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"
+                                                       text="Название:" />
+                                                <TextField fx:id="newChannelTitleField"
+                                                           style="-fx-background-color: #f8f9fa; -fx-background-radius: 6; -fx-border-color: #dee2e6; -fx-border-radius: 6; -fx-padding: 8; -fx-font-size: 12px;"
+                                                           promptText="Крипто новости" />
+                                            </children>
+                                        </VBox>
+
+                                        <Button fx:id="addChannelButton" onAction="#handleAddChannel"
+                                                disable="true"
+                                                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: 600; -fx-background-radius: 6; -fx-padding: 8 16 8 16; -fx-cursor: hand;"
+                                                text="➕ Добавить" />
+                                    </children>
+                                </HBox>
+
+                                <TextArea fx:id="newChannelDescriptionArea"
+                                          prefRowCount="2"
+                                          style="-fx-background-color: #f8f9fa; -fx-background-radius: 6; -fx-border-color: #dee2e6; -fx-border-radius: 6; -fx-padding: 8; -fx-font-size: 12px;"
+                                          promptText="Описание канала (необязательно)" />
+                            </children>
+                        </VBox>
+
+                        <Separator style="-fx-background-color: #e9ecef;" />
+
+                        <!-- Таблица каналов -->
+                        <VBox spacing="8.0">
+                            <children>
+                                <HBox spacing="12.0" alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #495057;"
+                                               text="Отслеживаемые каналы:" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Button fx:id="toggleChannelButton" onAction="#handleToggleChannel"
+                                                disable="true"
+                                                style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: 600; -fx-background-radius: 6; -fx-padding: 6 12 6 12; -fx-cursor: hand; -fx-font-size: 12px;"
+                                                text="▶️ Включить" />
+                                        <Button fx:id="removeChannelButton" onAction="#handleRemoveChannel"
+                                                disable="true"
+                                                style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: 600; -fx-background-radius: 6; -fx-padding: 6 12 6 12; -fx-cursor: hand; -fx-font-size: 12px;"
+                                                text="🗑️ Удалить" />
+                                    </children>
+                                </HBox>
+
+                                <TableView fx:id="channelsTable" prefHeight="200">
+                                    <columns>
+                                        <TableColumn fx:id="usernameColumn" text="Username" prefWidth="150" />
+                                        <TableColumn fx:id="titleColumn" text="Название" prefWidth="200" />
+                                        <TableColumn fx:id="activeColumn" text="Статус" prefWidth="120" />
+                                        <TableColumn fx:id="createdColumn" text="Создан" prefWidth="130" />
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+
+                <!-- Карточка с настройками уведомлений -->
+                <VBox spacing="16.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 24; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                               text="🔔 Настройки уведомлений" />
+
+                        <!-- Основной переключатель -->
+                        <VBox spacing="8.0">
+                            <children>
+                                <CheckBox fx:id="enabledCheckBox"
+                                          style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #2c3e50;"
+                                          text="📢 Включить Telegram уведомления" />
+                                <Label style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"
+                                       text="Общий переключатель для всех уведомлений о сделках" />
+                            </children>
+                        </VBox>
+
+                        <Separator style="-fx-background-color: #e9ecef;" />
+
+                        <!-- Типы уведомлений -->
+                        <VBox spacing="12.0">
+                            <children>
+                                <Label style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #495057;"
+                                       text="Отправлять уведомления при:" />
+
+                                <CheckBox fx:id="sendOnOpenCheckBox"
+                                          style="-fx-font-size: 13px; -fx-text-fill: #495057;"
+                                          text="🟢 Открытии новой сделки" />
+
+                                <CheckBox fx:id="sendOnCloseCheckBox"
+                                          style="-fx-font-size: 13px; -fx-text-fill: #495057;"
+                                          text="🔴 Закрытии сделки" />
+
+                                <CheckBox fx:id="sendOnUpdateCheckBox"
+                                          style="-fx-font-size: 13px; -fx-text-fill: #495057;"
+                                          text="🔄 Изменении сделки" />
+
+                                <CheckBox fx:id="includeImageCheckBox"
+                                          style="-fx-font-size: 13px; -fx-text-fill: #495057;"
+                                          text="📸 Включать изображения графиков" />
+                            </children>
+                        </VBox>
+
+                        <Separator style="-fx-background-color: #e9ecef;" />
+
+                        <!-- Шаблон сообщений -->
+                        <VBox spacing="12.0">
+                            <children>
+                                <Label style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #495057;"
+                                       text="📝 Шаблон сообщений:" />
+
+                                <Label style="-fx-font-size: 12px; -fx-text-fill: #6c757d;"
+                                       text="Настройте персональный формат уведомлений. Оставьте пустым для использования стандартного шаблона." />
+
+                                <TextArea fx:id="messageTemplateArea"
+                                          prefRowCount="6"
+                                          wrapText="true"
+                                          style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-padding: 12; -fx-font-size: 12px; -fx-font-family: 'Courier New', monospace;"
+                                          promptText="📊 {action} сделка: {symbol}&#10;💰 Цена: {price}&#10;📈 Объём: {volume}&#10;💵 Сумма: {volumeInCurrency}&#10;📅 Время: {openTime}&#10;&#10;Доступные переменные:&#10;{action}, {symbol}, {price}, {volume}, {volumeInCurrency}, {openTime}, {closeTime}, {profitLoss}, {notes}" />
+
+                                <!-- Подсказки по переменным -->
+                                <VBox spacing="6.0" style="-fx-background-color: #f1f3f4; -fx-background-radius: 6; -fx-padding: 12;">
+                                    <children>
+                                        <Label style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #495057;"
+                                               text="📋 Доступные переменные:" />
+
+                                        <GridPane hgap="16.0" vgap="4.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints prefWidth="120.0" />
+                                                <ColumnConstraints prefWidth="200.0" />
+                                                <ColumnConstraints prefWidth="120.0" />
+                                                <ColumnConstraints prefWidth="200.0" />
+                                            </columnConstraints>
+
+                                            <!-- Первая колонка переменных -->
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d; -fx-font-family: 'Courier New', monospace;" text="{action}" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #495057;" text="Действие (Открытие/Закрытие)" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d; -fx-font-family: 'Courier New', monospace;" text="{symbol}" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #495057;" text="Инструмент" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d; -fx-font-family: 'Courier New', monospace;" text="{price}" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #495057;" text="Цена" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d; -fx-font-family: 'Courier New', monospace;" text="{volume}" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #495057;" text="Объём" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                                            <!-- Вторая колонка переменных -->
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d; -fx-font-family: 'Courier New', monospace;" text="{volumeInCurrency}" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #495057;" text="Сумма в валюте" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d; -fx-font-family: 'Courier New', monospace;" text="{openTime}" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #495057;" text="Время открытия" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d; -fx-font-family: 'Courier New', monospace;" text="{closeTime}" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #495057;" text="Время закрытия" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d; -fx-font-family: 'Courier New', monospace;" text="{profitLoss}" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                            <Label style="-fx-font-size: 11px; -fx-text-fill: #495057;" text="Прибыль/Убыток" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                        </GridPane>
+
+                                        <Label style="-fx-font-size: 11px; -fx-text-fill: #6c757d; -fx-font-style: italic;"
+                                               text="💡 Совет: Используйте эмодзи для лучшего восприятия сообщений" />
+                                    </children>
+                                </VBox>
+
+                                <!-- Пример шаблона -->
+                                <VBox spacing="6.0" style="-fx-background-color: #e8f5e8; -fx-background-radius: 6; -fx-padding: 12;">
+                                    <children>
+                                        <Label style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #28a745;"
+                                               text="📄 Пример шаблона:" />
+
+                                        <Label style="-fx-font-size: 11px; -fx-text-fill: #495057; -fx-font-family: 'Courier New', monospace;"
+                                               text="🔔 {action} позиция&#10;📊 Символ: {symbol}&#10;💰 Цена: {price}&#10;📦 Объём: {volume}&#10;💵 Сумма: {volumeInCurrency}&#10;📅 Время: {openTime}" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+
+                        <Separator style="-fx-background-color: #e9ecef;" />
+
+                        <!-- Кнопки управления -->
+                        <HBox spacing="12.0" alignment="CENTER_LEFT">
+                            <children>
+                                <Button fx:id="saveButton" onAction="#handleSave"
+                                        style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: 600; -fx-background-radius: 8; -fx-padding: 12 24 12 24; -fx-cursor: hand;"
+                                        text="💾 Сохранить настройки" />
+
+                                <Button onAction="#loadCurrentSettings"
+                                        style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: 600; -fx-background-radius: 8; -fx-padding: 12 24 12 24; -fx-cursor: hand;"
+                                        text="🔄 Сбросить" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>

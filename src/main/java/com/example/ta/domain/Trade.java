@@ -42,6 +42,9 @@ public class Trade {
     @Column(name = "exit_point", precision = 15, scale = 2)
     private BigDecimal exitPoint;
 
+    @Column(name = "take_profit_target", precision = 19, scale = 8)
+    private BigDecimal takeProfitTarget;
+
     @Column(name = "profit", precision = 15, scale = 2)
     private BigDecimal profit;
 
@@ -174,4 +177,39 @@ public class Trade {
     public boolean hasChartImage() {
         return chartImagePath != null && !chartImagePath.trim().isEmpty();
     }
+
+    public BigDecimal calculatePotentialProfitToTarget() {
+        if (takeProfitTarget == null || entryPoint == null || volume == null) {
+            return null;
+        }
+
+        BigDecimal priceDifference;
+        if (tradeType == TradeType.LONG) {
+            priceDifference = takeProfitTarget.subtract(entryPoint);
+        } else {
+            priceDifference = entryPoint.subtract(takeProfitTarget);
+        }
+
+        return priceDifference.multiply(volume);
+    }
+
+    /**
+     * Вычисляет процент движения цены до цели тейка
+     */
+    public BigDecimal calculatePercentageToTarget() {
+        if (takeProfitTarget == null || entryPoint == null) {
+            return null;
+        }
+
+        BigDecimal priceDifference;
+        if (tradeType == TradeType.LONG) {
+            priceDifference = takeProfitTarget.subtract(entryPoint);
+        } else {
+            priceDifference = entryPoint.subtract(takeProfitTarget);
+        }
+
+        return priceDifference.divide(entryPoint, 4, BigDecimal.ROUND_HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+    }
+
 }

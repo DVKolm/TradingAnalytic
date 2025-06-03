@@ -39,6 +39,7 @@ public class TradeFormController implements Initializable {
     @FXML private DatePicker tradeDatePicker;
     @FXML private TextField entryPointField;
     @FXML private TextField exitPointField;
+    @FXML private TextField takeProfitTargetField; // НОВОЕ ПОЛЕ
     @FXML private TextField volumeField;
     @FXML private TextField profitLossField;
     @FXML private TextField entryTimeField;
@@ -84,11 +85,83 @@ public class TradeFormController implements Initializable {
         exitPointField.textProperty().addListener((obs, oldVal, newVal) -> calculateProfitLoss());
         volumeField.textProperty().addListener((obs, oldVal, newVal) -> calculateProfitLoss());
         tradeTypeComboBox.valueProperty().addListener((obs, oldVal, newVal) -> calculateProfitLoss());
+
+        // НОВЫЕ СЛУШАТЕЛИ для Take Profit Target
+        takeProfitTargetField.textProperty().addListener((obs, oldVal, newVal) -> calculatePotentialProfit());
+        entryPointField.textProperty().addListener((obs, oldVal, newVal) -> calculatePotentialProfit());
+        volumeField.textProperty().addListener((obs, oldVal, newVal) -> calculatePotentialProfit());
+        tradeTypeComboBox.valueProperty().addListener((obs, oldVal, newVal) -> calculatePotentialProfit());
     }
 
     /**
-     * Настройка слушателя для автоматического изменения статуса при заполнении времени выхода
+     * Рассчитывает потенциальную прибыль до цели Take Profit
      */
+    private void calculatePotentialProfit() {
+        try {
+            String entryPriceText = entryPointField.getText();
+            String targetPriceText = takeProfitTargetField.getText();
+            String volumeText = volumeField.getText();
+            TradeType tradeType = tradeTypeComboBox.getValue();
+
+            if (entryPriceText == null || entryPriceText.trim().isEmpty() ||
+                    targetPriceText == null || targetPriceText.trim().isEmpty() ||
+                    volumeText == null || volumeText.trim().isEmpty() ||
+                    tradeType == null) {
+                takeProfitTargetField.setTooltip(null);
+                return;
+            }
+
+            BigDecimal entryPrice = parseDecimal(entryPriceText);
+            BigDecimal targetPrice = parseDecimal(targetPriceText);
+            BigDecimal volume = parseDecimal(volumeText);
+
+            if (entryPrice == null || targetPrice == null || volume == null ||
+                    entryPrice.compareTo(BigDecimal.ZERO) <= 0 ||
+                    targetPrice.compareTo(BigDecimal.ZERO) <= 0 ||
+                    volume.compareTo(BigDecimal.ZERO) <= 0) {
+                takeProfitTargetField.setTooltip(null);
+                return;
+            }
+
+            BigDecimal priceDifference;
+            boolean isValidTarget = false;
+
+            if (tradeType == TradeType.LONG) {
+                priceDifference = targetPrice.subtract(entryPrice);
+                isValidTarget = targetPrice.compareTo(entryPrice) > 0;
+            } else {
+                priceDifference = entryPrice.subtract(targetPrice);
+                isValidTarget = targetPrice.compareTo(entryPrice) < 0;
+            }
+
+            BigDecimal potentialProfit = priceDifference.multiply(volume);
+            BigDecimal percentageMove = priceDifference.divide(entryPrice, 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
+
+            if (isValidTarget && potentialProfit.compareTo(BigDecimal.ZERO) > 0) {
+                String tooltipText = String.format(
+                        "💰 Потенциальная прибыль: $%.2f\n📊 Движение: %.2f%%",
+                        potentialProfit, percentageMove
+                );
+                takeProfitTargetField.setTooltip(new Tooltip(tooltipText));
+
+                log.debug("Рассчитана потенциальная прибыль до цели: ${} ({}%)",
+                        String.format("%.2f", potentialProfit),
+                        String.format("%.2f", percentageMove));
+            } else {
+                String errorText = tradeType == TradeType.LONG ?
+                        "⚠️ Цель должна быть выше цены входа для лонга" :
+                        "⚠️ Цель должна быть ниже цены входа для шорта";
+                takeProfitTargetField.setTooltip(new Tooltip(errorText));
+            }
+
+        } catch (Exception e) {
+            log.debug("Ошибка при расчете потенциальной прибыли: {}", e.getMessage());
+            takeProfitTargetField.setTooltip(null);
+        }
+    }
+
+
+    // Остальные методы без изменений...
     private void setupExitTimeStatusListener() {
         exitTimeField.textProperty().addListener((observable, oldValue, newValue) -> {
             log.debug("Изменение времени выхода: '{}' -> '{}'", oldValue, newValue);
@@ -127,9 +200,6 @@ public class TradeFormController implements Initializable {
         });
     }
 
-    /**
-     * Показывает небольшое уведомление об автоматическом изменении статуса
-     */
     private void showStatusChangeNotification(String message) {
         log.info("Уведомление: {}", message);
     }
@@ -188,6 +258,7 @@ public class TradeFormController implements Initializable {
     private void setupValidation() {
         setupNumericField(entryPointField);
         setupNumericField(exitPointField);
+        setupNumericField(takeProfitTargetField); // НОВОЕ ПОЛЕ
         setupNumericField(volumeField);
     }
 
@@ -199,9 +270,6 @@ public class TradeFormController implements Initializable {
         });
     }
 
-    /**
-     * Установка формы в режим создания новой сделки
-     */
     public void setCreateMode() {
         log.info("Установка формы в режим создания новой сделки");
 
@@ -243,9 +311,6 @@ public class TradeFormController implements Initializable {
         }
     }
 
-    /**
-     * Установка формы в режим редактирования существующей сделки
-     */
     public void setEditMode(Trade trade) {
         this.isEditMode = true;
         this.editingTrade = trade;
@@ -268,6 +333,10 @@ public class TradeFormController implements Initializable {
         }
         if (trade.getExitPoint() != null) {
             exitPointField.setText(trade.getExitPoint().toString());
+        }
+        // НОВОЕ ПОЛЕ
+        if (trade.getTakeProfitTarget() != null) {
+            takeProfitTargetField.setText(trade.getTakeProfitTarget().toString());
         }
         if (trade.getVolume() != null) {
             volumeField.setText(trade.getVolume().toString());
@@ -323,6 +392,7 @@ public class TradeFormController implements Initializable {
 
         trade.setEntryPoint(parseDecimal(entryPointField.getText()));
         trade.setExitPoint(parseDecimal(exitPointField.getText()));
+        trade.setTakeProfitTarget(parseDecimal(takeProfitTargetField.getText())); // НОВОЕ ПОЛЕ
         trade.setVolume(parseDecimal(volumeField.getText()));
         trade.setProfitLoss(parseDecimal(profitLossField.getText()));
 
@@ -368,6 +438,25 @@ public class TradeFormController implements Initializable {
 
         if (volumeField.getText() == null || volumeField.getText().trim().isEmpty()) {
             errors.append("• Объем сделки обязателен для заполнения\n");
+        }
+
+        // НОВАЯ ВАЛИДАЦИЯ для Take Profit Target
+        if (!takeProfitTargetField.getText().trim().isEmpty()) {
+            try {
+                BigDecimal entryPrice = parseDecimal(entryPointField.getText());
+                BigDecimal targetPrice = parseDecimal(takeProfitTargetField.getText());
+                TradeType tradeType = tradeTypeComboBox.getValue();
+
+                if (entryPrice != null && targetPrice != null && tradeType != null) {
+                    if (tradeType == TradeType.LONG && targetPrice.compareTo(entryPrice) <= 0) {
+                        errors.append("• Цель Take Profit для лонга должна быть выше цены входа\n");
+                    } else if (tradeType == TradeType.SHORT && targetPrice.compareTo(entryPrice) >= 0) {
+                        errors.append("• Цель Take Profit для шорта должна быть ниже цены входа\n");
+                    }
+                }
+            } catch (Exception e) {
+                errors.append("• Некорректное значение цели Take Profit\n");
+            }
         }
 
         // Проверяем корректность времени
@@ -459,6 +548,7 @@ public class TradeFormController implements Initializable {
             assetNameField.clear();
             entryPointField.clear();
             exitPointField.clear();
+            takeProfitTargetField.clear(); // НОВОЕ ПОЛЕ
             volumeField.clear();
             profitLossField.clear();
             entryTimeField.clear();
@@ -475,6 +565,8 @@ public class TradeFormController implements Initializable {
             tradeDatePicker.setValue(null);
 
             profitLossField.setStyle("");
+            takeProfitTargetField.setStyle(""); // Сброс стиля
+            takeProfitTargetField.setTooltip(null); // Сброс подсказки
 
             log.debug("Форма очищена успешно");
 

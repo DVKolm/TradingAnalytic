@@ -3,6 +3,7 @@ package com.example.ta.controller;
 import com.example.ta.config.SpringFXMLLoader;
 import com.example.ta.domain.Trade;
 import com.example.ta.events.NavigationEvent;
+import com.example.ta.service.TelegramSettingsService;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -12,6 +13,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import lombok.RequiredArgsConstructor;
@@ -56,36 +59,82 @@ public class MainController implements Initializable {
     private Label versionLabel;
     @FXML
     private Label userInfoLabel;
+    @FXML
+    private Label telegramStatusLabel;
 
+    private final TelegramSettingsService telegramSettingsService;
     private final SpringFXMLLoader springFXMLLoader;
+    private final NewsPanel newsPanel; // Добавляем зависимость
 
     private Button currentActiveButton;
     private List<Button> navigationButtons;
-
     private Timeline timelineTimer;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         log.info("Инициализация MainController");
 
-        // Добавляем новую кнопку в список навигационных кнопок
         navigationButtons = List.of(homeButton, tradesListButton, addTradeButton,
                 statisticsButton, positionCalculatorButton, averagingCalculatorButton);
 
         setupButtonHoverEffects();
-
         setupTimeUpdater();
-
         showHome();
-
         updateStatus("Приложение запущено");
 
         log.info("MainController инициализирован");
+
+        updateTelegramStatus();
+        Timeline telegramStatusUpdater = new Timeline(new KeyFrame(Duration.seconds(30), e -> updateTelegramStatus()));
+        telegramStatusUpdater.setCycleCount(Timeline.INDEFINITE);
+        telegramStatusUpdater.play();
     }
 
-    /**
-     * Обработчик событий навигации от других контроллеров
-     */
+    private void updateTelegramStatus() {
+        if (telegramStatusLabel != null && telegramSettingsService != null) {
+            try {
+                String status = telegramSettingsService.getTelegramStatus();
+                String displayText = getTelegramDisplayText(status);
+                String style = getTelegramStatusStyle(status);
+
+                telegramStatusLabel.setText(displayText);
+                telegramStatusLabel.setStyle(style);
+
+            } catch (Exception e) {
+                telegramStatusLabel.setText("📱 Telegram: ❌ Ошибка");
+                telegramStatusLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+                log.warn("Ошибка при обновлении статуса Telegram", e);
+            }
+        }
+    }
+
+    private String getTelegramDisplayText(String status) {
+        return switch (status) {
+            case "Активно" -> "📱 Telegram: ✅ Активно";
+            case "Отключено" -> "📱 Telegram: ⏸️ Отключено";
+            case "Не настроено" -> "📱 Telegram: ⚙️ Не настроено";
+            case "Неполные настройки" -> "📱 Telegram: ⚠️ Неполные настройки";
+            default -> "📱 Telegram: ❓ " + status;
+        };
+    }
+
+    private String getTelegramStatusStyle(String status) {
+        return switch (status) {
+            case "Активно" -> "-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 12px;";
+            case "Отключено" -> "-fx-text-fill: #f39c12; -fx-font-weight: bold; -fx-font-size: 12px;";
+            case "Не настроено" -> "-fx-text-fill: #95a5a6; -fx-font-weight: normal; -fx-font-size: 12px;";
+            case "Неполные настройки" -> "-fx-text-fill: #e74c3c; -fx-font-weight: normal; -fx-font-size: 12px;";
+            default -> "-fx-text-fill: #e74c3c; -fx-font-weight: normal; -fx-font-size: 12px;";
+        };
+    }
+
+    @FXML
+    private void showTelegramSettings() {
+        loadContent("/com/example/ta/telegram-settings.fxml");
+        setActiveButton(null);
+        updateStatus("Настройки Telegram");
+    }
+
     @EventListener
     public void onNavigationEvent(NavigationEvent event) {
         log.info("Получено событие навигации: {}", event.getNavigationType());
@@ -106,17 +155,18 @@ public class MainController implements Initializable {
             log.info("Показываем форму редактирования сделки: {}", trade.getId());
 
             FXMLLoader loader = springFXMLLoader.getLoader("/com/example/ta/trade-form-view.fxml");
-
             Node content = loader.load();
 
             TradeFormController controller = loader.getController();
             controller.setEditMode(trade);
 
+            // Создаем контейнер с новостной панелью справа
+            HBox mainContainer = createContentWithNews(content);
+
             contentArea.getChildren().clear();
-            contentArea.getChildren().add(content);
+            contentArea.getChildren().add(mainContainer);
 
             setActiveButton(addTradeButton);
-
             updateStatus("Редактирование сделки: " + trade.getAssetName());
             log.info("Загружен контент для редактирования: /com/example/ta/trade-form-view.fxml");
 
@@ -131,14 +181,16 @@ public class MainController implements Initializable {
             log.info("Показываем детали сделки: {}", trade.getId());
 
             FXMLLoader loader = springFXMLLoader.getLoader("/com/example/ta/trade-details.fxml");
-
             Node content = loader.load();
 
             TradeDetailsController controller = loader.getController();
             controller.setTrade(trade);
 
+            // Создаем контейнер с новостной панелью справа
+            HBox mainContainer = createContentWithNews(content);
+
             contentArea.getChildren().clear();
-            contentArea.getChildren().add(content);
+            contentArea.getChildren().add(mainContainer);
 
             updateStatus("Отображаются детали сделки: " + trade.getAssetName());
             log.info("Загружен контент: /com/example/ta/trade-details.fxml");
@@ -169,7 +221,6 @@ public class MainController implements Initializable {
             });
         }
 
-        // Специальные эффекты для кнопки "Главная"
         homeButton.setOnMouseEntered(e -> {
             if (homeButton != currentActiveButton) {
                 homeButton.setStyle("-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20; -fx-effect: dropshadow(gaussian, rgba(52,152,219,0.2), 4, 0, 0, 1);");
@@ -181,7 +232,6 @@ public class MainController implements Initializable {
             }
         });
 
-        // Эффекты для кнопки обновления
         refreshButton.setOnMouseEntered(e ->
                 refreshButton.setStyle("-fx-background-color: #e9ecef; -fx-text-fill: #495057; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;"));
         refreshButton.setOnMouseExited(e ->
@@ -219,13 +269,36 @@ public class MainController implements Initializable {
     private void loadContent(String fxmlPath) {
         try {
             Node content = springFXMLLoader.load(fxmlPath);
+
+            // Создаем контейнер с новостной панелью справа
+            HBox mainContainer = createContentWithNews(content);
+
             contentArea.getChildren().clear();
-            contentArea.getChildren().add(content);
+            contentArea.getChildren().add(mainContainer);
             log.info("Загружен контент: {}", fxmlPath);
         } catch (Exception e) {
             log.error("Ошибка при загрузке контента: {}", fxmlPath, e);
             updateStatus("Ошибка при загрузке: " + fxmlPath);
         }
+    }
+
+    /**
+     * Создает контейнер с основным контентом слева и новостной панелью справа
+     */
+    private HBox createContentWithNews(Node mainContent) {
+        HBox container = new HBox();
+        container.setSpacing(16);
+        container.setStyle("-fx-padding: 16;");
+
+        // Основной контент занимает всё доступное пространство
+        HBox.setHgrow(mainContent, Priority.ALWAYS);
+
+        // Клонируем новостную панель для безопасности
+        NewsPanel newsClone = new NewsPanel(newsPanel.getTelegramNewsService());
+
+        container.getChildren().addAll(mainContent, newsClone);
+
+        return container;
     }
 
     @FXML
@@ -268,9 +341,6 @@ public class MainController implements Initializable {
         updateStatus("Калькулятор позиции");
     }
 
-    /**
-     * Новый метод для отображения калькулятора усреднения
-     */
     @FXML
     private void showAveragingCalculator() {
         log.info("Показываем калькулятор усреднения");
@@ -283,7 +353,11 @@ public class MainController implements Initializable {
     private void refreshCurrentView() {
         log.info("Обновляем текущий вид");
 
-        // Определяем какая кнопка активна и перезагружаем соответствующий контент
+        // Обновляем новостную панель
+        if (newsPanel != null) {
+            newsPanel.refresh();
+        }
+
         if (currentActiveButton == homeButton) {
             showHome();
         } else if (currentActiveButton == tradesListButton) {
@@ -322,9 +396,6 @@ public class MainController implements Initializable {
         showPositionCalculator();
     }
 
-    /**
-     * Новый публичный метод для навигации к калькулятору усреднения
-     */
     public void navigateToAveragingCalculator() {
         showAveragingCalculator();
     }
@@ -333,10 +404,12 @@ public class MainController implements Initializable {
         updateStatus(message);
     }
 
-    // Освобождаем ресурсы при закрытии
     public void shutdown() {
         if (timelineTimer != null) {
             timelineTimer.stop();
+        }
+        if (newsPanel != null) {
+            newsPanel.shutdown();
         }
         log.info("MainController завершен");
     }
