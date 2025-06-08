@@ -1,4 +1,4 @@
-package com.example.ta.domain;
+package com.example.ta.domain.trading;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;

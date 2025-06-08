@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="mainContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="300.0"
+      prefWidth="350.0" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 0 0 0 1;"
+      xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.ta.controller.news.NewsSidebarController">
+   <children>
+      <!-- Заголовок панели -->
+      <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #ffffff; -fx-border-color: #dee2e6; -fx-border-width: 0 0 1 0; -fx-padding: 10;">
+         <children>
+            <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="📰 Новостная лента" />
+            <Region HBox.hgrow="ALWAYS" />
+            <ComboBox fx:id="newsLimitComboBox" prefWidth="60.0" />
+            <Button fx:id="refreshButton" text="🔄" />
+         </children>
+      </HBox>
+
+      <!-- Основной контент в единственном ScrollPane -->
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox spacing="10.0">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+
+               <!-- Секция Telegram -->
+               <VBox fx:id="telegramSection" spacing="5.0">
+                  <children>
+                     <!-- Заголовок Telegram -->
+                     <HBox alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: #e3f2fd; -fx-padding: 8; -fx-background-radius: 5;">
+                        <children>
+                           <Button fx:id="telegramToggleButton" prefHeight="20.0" prefWidth="20.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="▼" />
+                           <Label fx:id="telegramHeader" text="Telegram" />
+                        </children>
+                     </HBox>
+
+                     <!-- Контент Telegram без ScrollPane -->
+                     <VBox fx:id="telegramNewsContainer" spacing="5.0" />
+                  </children>
+               </VBox>
+
+               <!-- Секция Twitter -->
+               <VBox fx:id="twitterSection" spacing="5.0">
+                  <children>
+                     <!-- Заголовок Twitter -->
+                     <HBox alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: #e8f5fe; -fx-padding: 8; -fx-background-radius: 5;">
+                        <children>
+                           <Button fx:id="twitterToggleButton" prefHeight="20.0" prefWidth="20.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="▼" />
+                           <Label fx:id="twitterHeader" text="Twitter" />
+                        </children>
+                     </HBox>
+
+                     <!-- Контент Twitter без ScrollPane -->
+                     <VBox fx:id="twitterNewsContainer" spacing="5.0" />
+                  </children>
+               </VBox>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </children>
+</VBox>

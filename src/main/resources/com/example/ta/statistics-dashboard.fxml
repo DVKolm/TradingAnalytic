@@ -6,7 +6,7 @@
 <?import javafx.scene.chart.*?>
 
 <ScrollPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.ta.controller.StatisticsController"
+            fx:controller="com.example.ta.controller.trading.StatisticsController"
             fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
             style="-fx-background-color: #f8f9fa; -fx-border-color: transparent;">
    <content>

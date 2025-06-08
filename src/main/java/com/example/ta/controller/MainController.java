@@ -1,21 +1,32 @@
+
 package com.example.ta.controller;
 
 import com.example.ta.config.SpringFXMLLoader;
-import com.example.ta.domain.Trade;
+import com.example.ta.controller.news.NewsPanel;
+import com.example.ta.controller.news.NewsSidebarController;
+import com.example.ta.controller.trading.TradeDetailsController;
+import com.example.ta.controller.trading.TradeFormController;
+import com.example.ta.domain.trading.Trade;
 import com.example.ta.events.NavigationEvent;
+import com.example.ta.repository.NewsMessageRepository;
+import com.example.ta.service.MediaDownloadService;
+import com.example.ta.service.TelegramNewsService;
 import com.example.ta.service.TelegramSettingsService;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,13 +73,26 @@ public class MainController implements Initializable {
     @FXML
     private Label telegramStatusLabel;
 
+    // Новые элементы для новостной панели
+    @FXML
+    private Button toggleNewsButton;
+    @FXML
+    private VBox newsContainer;
+
+    private final TelegramNewsService telegramNewsService; // Добавьте это поле
     private final TelegramSettingsService telegramSettingsService;
     private final SpringFXMLLoader springFXMLLoader;
-    private final NewsPanel newsPanel; // Добавляем зависимость
+    private final MediaDownloadService mediaDownloadService;
 
     private Button currentActiveButton;
     private List<Button> navigationButtons;
     private Timeline timelineTimer;
+
+    private final NewsMessageRepository newsMessageRepository; // ❗ ДОБАВИТЬ
+    // Состояние новостной панели
+    private NewsSidebarController newsSidebarController;
+    private boolean newsPanelVisible = true;
+    private Node currentMainContent;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -79,6 +103,7 @@ public class MainController implements Initializable {
 
         setupButtonHoverEffects();
         setupTimeUpdater();
+        setupNewsPanel();
         showHome();
         updateStatus("Приложение запущено");
 
@@ -88,6 +113,85 @@ public class MainController implements Initializable {
         Timeline telegramStatusUpdater = new Timeline(new KeyFrame(Duration.seconds(30), e -> updateTelegramStatus()));
         telegramStatusUpdater.setCycleCount(Timeline.INDEFINITE);
         telegramStatusUpdater.play();
+    }
+
+    private void setupNewsPanel() {
+        // Настройка кнопки переключения новостной панели
+        if (toggleNewsButton != null) {
+            toggleNewsButton.setOnAction(e -> toggleNewsPanel());
+            toggleNewsButton.setText("📰");
+            toggleNewsButton.setTooltip(new Tooltip("Показать/скрыть новости"));
+
+            // Стили для кнопки
+            String buttonStyle = "-fx-background-color: transparent; -fx-text-fill: #6c757d; " +
+                    "-fx-font-size: 16px; -fx-background-radius: 8; -fx-border-color: transparent; " +
+                    "-fx-cursor: hand; -fx-padding: 8;";
+            toggleNewsButton.setStyle(buttonStyle);
+
+            toggleNewsButton.setOnMouseEntered(e ->
+                    toggleNewsButton.setStyle(buttonStyle.replace("transparent", "#e9ecef")));
+            toggleNewsButton.setOnMouseExited(e ->
+                    toggleNewsButton.setStyle(buttonStyle));
+        }
+
+        // Загружаем новостную панель
+        loadNewsSidebar();
+    }
+
+    private void loadNewsSidebar() {
+        try {
+            FXMLLoader loader = springFXMLLoader.getLoader("/com/example/ta/news-sidebar-view.fxml");
+            Node newsSidebarContent = loader.load();
+            newsSidebarController = loader.getController();
+
+            // Добавляем в контейнер новостей
+            if (newsContainer != null) {
+                newsContainer.getChildren().clear();
+                newsContainer.getChildren().add(newsSidebarContent);
+            }
+
+            log.info("Боковая панель новостей загружена успешно");
+
+        } catch (Exception e) {
+            log.error("Ошибка загрузки боковой панели новостей", e);
+            // Показываем ошибку, но не останавливаем работу приложения
+            if (newsContainer != null) {
+                Label errorLabel = new Label("Ошибка загрузки новостей");
+                errorLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-style: italic;");
+                newsContainer.getChildren().clear();
+                newsContainer.getChildren().add(errorLabel);
+            }
+        }
+    }
+
+    @FXML
+    private void toggleNewsPanel() {
+        newsPanelVisible = !newsPanelVisible;
+
+        if (newsPanelVisible) {
+            if (currentMainContent != null) {
+                HBox containerWithNews = createContentWithNews(currentMainContent);
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(containerWithNews);
+            }
+
+            toggleNewsButton.setTooltip(new Tooltip("Скрыть новости"));
+
+            // Обновляем новости при показе
+            if (newsSidebarController != null) {
+                newsSidebarController.forceRefresh();
+            }
+        } else {
+            // Скрываем панель - показываем только основной контент
+            if (currentMainContent != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(currentMainContent);
+            }
+
+            toggleNewsButton.setTooltip(new Tooltip("Показать новости"));
+        }
+
+        log.info("Новостная панель {}", newsPanelVisible ? "показана" : "скрыта");
     }
 
     private void updateTelegramStatus() {
@@ -135,6 +239,13 @@ public class MainController implements Initializable {
         updateStatus("Настройки Telegram");
     }
 
+    @FXML
+    private void showTwitterSettings() {
+        loadContent("/com/example/ta/twitter-settings.fxml");
+        setActiveButton(null);
+        updateStatus("Настройки X");
+    }
+
     @EventListener
     public void onNavigationEvent(NavigationEvent event) {
         log.info("Получено событие навигации: {}", event.getNavigationType());
@@ -160,11 +271,9 @@ public class MainController implements Initializable {
             TradeFormController controller = loader.getController();
             controller.setEditMode(trade);
 
-            // Создаем контейнер с новостной панелью справа
-            HBox mainContainer = createContentWithNews(content);
-
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(mainContainer);
+            // Сохраняем основной контент и создаем layout
+            currentMainContent = content;
+            updateContentArea();
 
             setActiveButton(addTradeButton);
             updateStatus("Редактирование сделки: " + trade.getAssetName());
@@ -186,11 +295,9 @@ public class MainController implements Initializable {
             TradeDetailsController controller = loader.getController();
             controller.setTrade(trade);
 
-            // Создаем контейнер с новостной панелью справа
-            HBox mainContainer = createContentWithNews(content);
-
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(mainContainer);
+            // Сохраняем основной контент и создаем layout
+            currentMainContent = content;
+            updateContentArea();
 
             updateStatus("Отображаются детали сделки: " + trade.getAssetName());
             log.info("Загружен контент: /com/example/ta/trade-details.fxml");
@@ -270,15 +377,29 @@ public class MainController implements Initializable {
         try {
             Node content = springFXMLLoader.load(fxmlPath);
 
-            // Создаем контейнер с новостной панелью справа
-            HBox mainContainer = createContentWithNews(content);
+            // Сохраняем основной контент и обновляем область отображения
+            currentMainContent = content;
+            updateContentArea();
 
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(mainContainer);
             log.info("Загружен контент: {}", fxmlPath);
         } catch (Exception e) {
             log.error("Ошибка при загрузке контента: {}", fxmlPath, e);
             updateStatus("Ошибка при загрузке: " + fxmlPath);
+        }
+    }
+
+    private void updateContentArea() {
+        contentArea.getChildren().clear();
+
+        if (currentMainContent != null) {
+            if (newsPanelVisible) {
+                // Создаем контейнер с новостной панелью
+                HBox containerWithNews = createContentWithNews(currentMainContent);
+                contentArea.getChildren().add(containerWithNews);
+            } else {
+                // Показываем только основной контент
+                contentArea.getChildren().add(currentMainContent);
+            }
         }
     }
 
@@ -287,19 +408,18 @@ public class MainController implements Initializable {
      */
     private HBox createContentWithNews(Node mainContent) {
         HBox container = new HBox();
-        container.setSpacing(16);
-        container.setStyle("-fx-padding: 16;");
+        container.setSpacing(10);
+        container.setPadding(new Insets(10));
 
-        // Основной контент занимает всё доступное пространство
         HBox.setHgrow(mainContent, Priority.ALWAYS);
 
-        // Клонируем новостную панель для безопасности
-        NewsPanel newsClone = new NewsPanel(newsPanel.getTelegramNewsService());
+        NewsPanel newsPanel = new NewsPanel(telegramNewsService, newsMessageRepository, mediaDownloadService);
 
-        container.getChildren().addAll(mainContent, newsClone);
-
+        container.getChildren().addAll(mainContent, newsPanel);
         return container;
     }
+
+
 
     @FXML
     private void showHome() {
@@ -354,8 +474,8 @@ public class MainController implements Initializable {
         log.info("Обновляем текущий вид");
 
         // Обновляем новостную панель
-        if (newsPanel != null) {
-            newsPanel.refresh();
+        if (newsSidebarController != null) {
+            newsSidebarController.forceRefresh();
         }
 
         if (currentActiveButton == homeButton) {
@@ -408,8 +528,8 @@ public class MainController implements Initializable {
         if (timelineTimer != null) {
             timelineTimer.stop();
         }
-        if (newsPanel != null) {
-            newsPanel.shutdown();
+        if (newsSidebarController != null) {
+            // Добавляем метод shutdown для новостной панели при необходимости
         }
         log.info("MainController завершен");
     }

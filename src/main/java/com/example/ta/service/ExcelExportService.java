@@ -1,8 +1,8 @@
 
 package com.example.ta.service;
 
-import com.example.ta.domain.Trade;
-import com.example.ta.domain.TradeStatistics;
+import com.example.ta.domain.trading.Trade;
+import com.example.ta.domain.trading.TradeStatistics;
 import com.example.ta.util.NumberFormatUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

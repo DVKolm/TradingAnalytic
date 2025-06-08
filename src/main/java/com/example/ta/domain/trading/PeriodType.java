@@ -1,10 +1,9 @@
-package com.example.ta.domain;
+package com.example.ta.domain.trading;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 @Getter
 @RequiredArgsConstructor

@@ -1,8 +1,8 @@
-package com.example.ta.controller;
+package com.example.ta.controller.trading;
 
-import com.example.ta.domain.PeriodType;
-import com.example.ta.domain.Trade;
-import com.example.ta.domain.TradeStatistics;
+import com.example.ta.domain.trading.PeriodType;
+import com.example.ta.domain.trading.Trade;
+import com.example.ta.domain.trading.TradeStatistics;
 import com.example.ta.events.TradeDataChangedEvent;
 import com.example.ta.service.ExcelExportService;
 import com.example.ta.service.TradeService;

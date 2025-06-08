@@ -1,6 +1,6 @@
 package com.example.ta.repository;
 
-import com.example.ta.domain.TelegramChannel;
+import com.example.ta.domain.news.TelegramChannel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

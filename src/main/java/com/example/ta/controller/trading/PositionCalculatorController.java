@@ -1,7 +1,7 @@
 
-package com.example.ta.controller;
+package com.example.ta.controller.trading;
 
-import com.example.ta.domain.PositionCalculation;
+import com.example.ta.domain.trading.PositionCalculation;
 import com.example.ta.service.PositionCalculatorService;
 import com.example.ta.util.NumberFormatUtil;
 import javafx.fxml.FXML;

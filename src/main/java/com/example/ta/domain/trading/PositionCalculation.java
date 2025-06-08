@@ -1,4 +1,4 @@
-package com.example.ta.domain;
+package com.example.ta.domain.trading;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,20 +1,17 @@
 package com.example.ta.controller;
 
 import com.example.ta.events.NavigationEvent;
-import com.example.ta.domain.Trade;
-import com.example.ta.domain.TradeStatistics;
-import com.example.ta.domain.TradeStatus;
-import com.example.ta.domain.TradeType;
+import com.example.ta.domain.trading.Trade;
+import com.example.ta.domain.trading.TradeStatistics;
+import com.example.ta.domain.trading.TradeStatus;
+import com.example.ta.domain.trading.TradeType;
 import com.example.ta.service.TradeService;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,7 +21,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 

@@ -1,6 +1,6 @@
 package com.example.ta.service;
 
-import com.example.ta.domain.TelegramSettings;
+import com.example.ta.domain.news.TelegramSettings;
 import com.example.ta.repository.TelegramSettingsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package com.example.ta.service;
 
-import com.example.ta.domain.PositionCalculation;
+import com.example.ta.domain.trading.PositionCalculation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

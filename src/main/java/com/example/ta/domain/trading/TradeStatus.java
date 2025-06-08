@@ -1,4 +1,4 @@
-package com.example.ta.domain;
+package com.example.ta.domain.trading;
 
 public enum TradeStatus {
     OPEN("Открыта"), CLOSED("Закрыта");

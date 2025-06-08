@@ -21,6 +21,14 @@ logging:
     root: INFO
     com.example.ta: DEBUG
 
+app:
+  media:
+    storage:
+      path: media
+    thumbnail:
+      width: 300
+      height: 200
+
 telegram:
   news:
     message-lifetime-hours: 3

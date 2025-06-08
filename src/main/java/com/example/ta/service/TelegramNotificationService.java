@@ -1,12 +1,11 @@
 package com.example.ta.service;
 
-import com.example.ta.domain.TelegramSettings;
-import com.example.ta.domain.Trade;
+import com.example.ta.domain.news.TelegramSettings;
+import com.example.ta.domain.trading.Trade;
 import com.example.ta.repository.TelegramSettingsRepository;
 import com.example.ta.util.NumberFormatUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;

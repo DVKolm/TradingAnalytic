@@ -1,10 +1,10 @@
-package com.example.ta.controller;
+package com.example.ta.controller.trading;
 
+import com.example.ta.domain.trading.Currency;
 import com.example.ta.events.NavigationEvent;
-import com.example.ta.domain.Trade;
+import com.example.ta.domain.trading.Trade;
 import com.example.ta.service.ImageViewerService;
 import com.example.ta.service.TradeService;
-import com.example.ta.util.DateMaskFormatter;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -152,7 +152,7 @@ public class TradeDetailsController implements Initializable {
         log.info("Отображены детали сделки: {}", currentTrade.getId());
     }
 
-    private String formatPrice(BigDecimal price, com.example.ta.domain.Currency currency) {
+    private String formatPrice(BigDecimal price, Currency currency) {
         if (price == null) return "N/A";
         return String.format("%s%.2f", currency.getSymbol(), price);
     }

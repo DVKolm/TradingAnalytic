@@ -1,6 +1,6 @@
 package com.example.ta.events;
 
-import com.example.ta.domain.Trade;
+import com.example.ta.domain.trading.Trade;
 import lombok.Getter;
 
 @Getter

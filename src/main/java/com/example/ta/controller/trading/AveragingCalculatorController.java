@@ -1,7 +1,6 @@
-package com.example.ta.controller;
+package com.example.ta.controller.trading;
 
 import com.example.ta.util.NumberFormatUtil;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;

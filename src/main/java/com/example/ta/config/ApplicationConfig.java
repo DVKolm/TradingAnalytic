@@ -1,5 +1,7 @@
 package com.example.ta.config;
 
+import com.example.ta.domain.news.TwitterSettings;
+import com.example.ta.repository.TwitterSettingsRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,5 +21,19 @@ public class ApplicationConfig {
     public TelegramBotsApi telegramBotsApi() throws TelegramApiException {
         return new TelegramBotsApi(DefaultBotSession.class);
     }
+
+    @Bean
+    public TwitterSettings twitterSettings(TwitterSettingsRepository repository) {
+        return repository.findFirst()
+                .orElse(createDefaultTwitterSettings());
+    }
+
+    private TwitterSettings createDefaultTwitterSettings() {
+        TwitterSettings settings = new TwitterSettings();
+        settings.setIsEnabled(false);
+        settings.setPollIntervalMinutes(5);
+        return settings;
+    }
+
 }
 

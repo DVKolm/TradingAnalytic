@@ -1,8 +1,8 @@
 
-package com.example.ta.controller;
+package com.example.ta.controller.news;
 
-import com.example.ta.domain.TelegramChannel;
-import com.example.ta.domain.TelegramSettings;
+import com.example.ta.domain.news.TelegramChannel;
+import com.example.ta.domain.news.TelegramSettings;
 import com.example.ta.service.TelegramNewsService;
 import com.example.ta.service.TelegramSettingsService;
 import javafx.application.Platform;
@@ -145,7 +145,7 @@ public class TelegramSettingsController implements Initializable {
             toggleChannelButton.setDisable(!hasSelection);
 
             if (hasSelection) {
-                toggleChannelButton.setText(newSelection.getIsActive() ? "⏸️ Отключить" : "▶️ Включить");
+                toggleChannelButton.setText(newSelection.getIsActive() ? "Отключить" : "Включить");
             }
         });
     }

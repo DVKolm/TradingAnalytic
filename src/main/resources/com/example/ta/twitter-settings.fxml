@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.ta.controller.news.TwitterSettingsController">
+   <children>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+         <content>
+            <VBox spacing="20.0">
+               <children>
+                  <!-- Заголовок -->
+                  <Label style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Настройки Twitter" />
+                  
+                  <!-- Статус -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <children>
+                        <Label fx:id="statusLabel" style="-fx-font-size: 14; -fx-font-weight: bold;" text="Статус: Не настроено" />
+                     </children>
+                  </HBox>
+                  
+                  <!-- Основные настройки -->
+                  <VBox spacing="15.0" style="-fx-border-color: #bdc3c7; -fx-border-radius: 8; -fx-background-color: #f8f9fa; -fx-background-radius: 8;">
+                     <children>
+                        <Label style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #34495e;" text="Основные настройки" />
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <CheckBox fx:id="enabledCheckBox" text="Включить Twitter интеграцию" />
+                           </children>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Label minWidth="120.0" text="Bearer Token:" />
+                              <PasswordField fx:id="bearerTokenField" prefWidth="300.0" promptText="Введите Bearer Token" />
+                           </children>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Label minWidth="120.0" text="API Key:" />
+                              <TextField fx:id="apiKeyField" prefWidth="300.0" promptText="Введите API Key" />
+                           </children>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Label minWidth="120.0" text="API Secret:" />
+                              <PasswordField fx:id="apiSecretField" prefWidth="300.0" promptText="Введите API Secret" />
+                           </children>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Label minWidth="120.0" text="Access Token:" />
+                              <TextField fx:id="accessTokenField" prefWidth="300.0" promptText="Введите Access Token" />
+                           </children>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Label minWidth="120.0" text="Access Token Secret:" />
+                              <PasswordField fx:id="accessTokenSecretField" prefWidth="300.0" promptText="Введите Access Token Secret" />
+                           </children>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Label minWidth="120.0" text="Интервал опроса (мин):" />
+                              <Spinner fx:id="pollIntervalSpinner" prefWidth="100.0" />
+                           </children>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                           <children>
+                              <Button fx:id="testConnectionButton" onAction="#testConnection" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Проверить соединение" />
+                              <Button fx:id="saveButton" onAction="#saveSettings" style="-fx-background-color: #27ae60; -fx-text-fill: white;" text="Сохранить" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+                  
+                  <!-- Управление пользователями -->
+                  <VBox spacing="15.0" style="-fx-border-color: #bdc3c7; -fx-border-radius: 8; -fx-background-color: #f8f9fa; -fx-background-radius: 8;">
+                     <children>
+                        <Label style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #34495e;" text="Отслеживаемые пользователи" />
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Label text="Добавить пользователя:" />
+                              <TextField fx:id="usernameField" prefWidth="200.0" promptText="@username" />
+                              <Button fx:id="addUserButton" onAction="#addUser" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Добавить" />
+                           </children>
+                        </HBox>
+                        
+                        <TableView fx:id="usersTable" prefHeight="200.0">
+                           <columns>
+                              <TableColumn fx:id="usernameColumn" prefWidth="150.0" text="Username" />
+                              <TableColumn fx:id="displayNameColumn" prefWidth="150.0" text="Имя" />
+                              <TableColumn fx:id="followersColumn" prefWidth="100.0" text="Подписчики" />
+                              <TableColumn fx:id="activeColumn" prefWidth="80.0" text="Активен" />
+                              <TableColumn fx:id="actionsColumn" prefWidth="100.0" text="Действия" />
+                           </columns>
+                        </TableView>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+                  
+                  <!-- Статистика -->
+                  <VBox spacing="15.0" style="-fx-border-color: #bdc3c7; -fx-border-radius: 8; -fx-background-color: #f8f9fa; -fx-background-radius: 8;">
+                     <children>
+                        <Label style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #34495e;" text="Статистика" />
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="20.0">
+                           <children>
+                              <VBox alignment="CENTER" spacing="5.0">
+                                 <children>
+                                    <Label fx:id="activeUsersLabel" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #27ae60;" text="0" />
+                                    <Label text="Активных пользователей" />
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" spacing="5.0">
+                                 <children>
+                                    <Label fx:id="totalTweetsLabel" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #3498db;" text="0" />
+                                    <Label text="Всего твитов" />
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" spacing="5.0">
+                                 <children>
+                                    <Label fx:id="todayTweetsLabel" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #e74c3c;" text="0" />
+                                    <Label text="Твитов сегодня" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </children>
+</VBox>

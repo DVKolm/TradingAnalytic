@@ -117,6 +117,8 @@ dependencies {
 
     implementation("org.jsoup:jsoup:1.17.2")
 
+    implementation("com.twitter:twitter-api-java-sdk:2.0.3")
+
 
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")

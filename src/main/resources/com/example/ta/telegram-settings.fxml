@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <ScrollPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.ta.controller.TelegramSettingsController"
+            fx:controller="com.example.ta.controller.news.TelegramSettingsController"
             style="-fx-background-color: #f8f9fa;">
 
     <content>
@@ -127,11 +127,11 @@
                                         <Button fx:id="toggleChannelButton" onAction="#handleToggleChannel"
                                                 disable="true"
                                                 style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: 600; -fx-background-radius: 6; -fx-padding: 6 12 6 12; -fx-cursor: hand; -fx-font-size: 12px;"
-                                                text="▶️ Включить" />
+                                                text="Включить" />
                                         <Button fx:id="removeChannelButton" onAction="#handleRemoveChannel"
                                                 disable="true"
                                                 style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: 600; -fx-background-radius: 6; -fx-padding: 6 12 6 12; -fx-cursor: hand; -fx-font-size: 12px;"
-                                                text="🗑️ Удалить" />
+                                                text="Удалить" />
                                     </children>
                                 </HBox>
 

@@ -1,4 +1,4 @@
-package com.example.ta.domain;
+package com.example.ta.domain.news;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

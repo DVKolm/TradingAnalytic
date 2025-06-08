@@ -1,7 +1,9 @@
+
 package com.example.ta.service;
 
-import com.example.ta.domain.NewsMessage;
-import com.example.ta.domain.TelegramChannel;
+import com.example.ta.domain.news.NewsMessage;
+import com.example.ta.domain.news.SourceType;
+import com.example.ta.domain.news.TelegramChannel;
 import com.example.ta.repository.NewsMessageRepository;
 import com.example.ta.repository.TelegramChannelRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,6 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -32,6 +33,7 @@ public class TelegramNewsService {
 
     private final NewsMessageRepository newsMessageRepository;
     private final TelegramChannelRepository channelRepository;
+    private final MediaDownloadService mediaDownloadService; // Добавляем сервис для работы с медиа
 
     // Паттерны для извлечения времени из разных форматов
     private static final Pattern TIME_PATTERN = Pattern.compile("(\\d{1,2}:\\d{2})");
@@ -110,7 +112,7 @@ public class TelegramNewsService {
     }
 
     /**
-     * 🔍 Парсинг и сохранение сообщения
+     * 🔍 Парсинг и сохранение сообщения с поддержкой медиафайлов
      */
     private boolean parseAndSaveMessage(Element messageElement, TelegramChannel channel) {
         try {
@@ -133,10 +135,19 @@ public class TelegramNewsService {
 
             // Извлекаем текст сообщения
             Element textElement = messageElement.select(".tgme_widget_message_text").first();
-            if (textElement == null) return false;
+            String messageText = "";
+            if (textElement != null) {
+                messageText = textElement.text().trim();
+            }
 
-            String messageText = textElement.text();
-            if (messageText.trim().isEmpty()) return false;
+            // Проверяем есть ли медиа в сообщении
+            MediaInfo mediaInfo = extractMediaInfo(messageElement);
+
+            // Если нет ни текста, ни медиа - пропускаем
+            if (messageText.isEmpty() && !mediaInfo.hasMedia) {
+                log.debug("Сообщение {} не содержит ни текста, ни медиа", messageId);
+                return false;
+            }
 
             // Извлекаем дату с правильным часовым поясом
             LocalDateTime messageDate = extractMessageDateWithTimezone(messageElement);
@@ -148,12 +159,42 @@ public class TelegramNewsService {
             newsMessage.setChannelTitle(channel.getTitle());
             newsMessage.setMessageText(messageText);
             newsMessage.setMessageDate(messageDate);
+            newsMessage.setSourceType(SourceType.TELEGRAM); // Устанавливаем тип источника
+
+            // Обрабатываем медиафайлы
+            if (mediaInfo.hasMedia) {
+                newsMessage.setHasMedia(true);
+                newsMessage.setMediaType(mediaInfo.mediaType);
+                newsMessage.setMediaUrl(mediaInfo.mediaUrl);
+
+                log.debug("📷 Найдено медиа в сообщении {}: тип={}, URL={}",
+                        messageId, mediaInfo.mediaType, mediaInfo.mediaUrl);
+
+                // Скачиваем и создаем миниатюру в фоновом режиме
+                if ("photo".equals(mediaInfo.mediaType) && mediaInfo.mediaUrl != null) {
+                    try {
+                        String thumbnailPath = mediaDownloadService.downloadAndCreateThumbnail(
+                                mediaInfo.mediaUrl,
+                                String.valueOf(messageId),
+                                mediaInfo.mediaType
+                        );
+
+                        if (thumbnailPath != null) {
+                            newsMessage.setMediaThumbnailPath(thumbnailPath);
+                            log.debug("✅ Миниатюра создана: {}", thumbnailPath);
+                        }
+                    } catch (Exception e) {
+                        log.warn("Ошибка при скачивании медиа для сообщения {}: {}", messageId, e.getMessage());
+                    }
+                }
+            }
 
             newsMessageRepository.save(newsMessage);
 
-            log.debug("💾 Сохранено: {} - {} (время: {})",
+            log.debug("💾 Сохранено: {} - {} (медиа: {}, время: {})",
                     channel.getUsername(),
-                    messageText.substring(0, Math.min(50, messageText.length())),
+                    messageText.length() > 50 ? messageText.substring(0, 50) + "..." : messageText,
+                    mediaInfo.hasMedia ? mediaInfo.mediaType : "нет",
                     messageDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")));
 
             return true;
@@ -162,6 +203,129 @@ public class TelegramNewsService {
             log.debug("Ошибка обработки сообщения: {}", e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * 📷 Извлечение информации о медиафайлах из HTML элемента сообщения
+     */
+    private MediaInfo extractMediaInfo(Element messageElement) {
+        MediaInfo mediaInfo = new MediaInfo();
+
+        try {
+            // Ищем изображение в разных местах
+
+            // 1. Ищем в .tgme_widget_message_photo_wrap
+            Element photoWrap = messageElement.select(".tgme_widget_message_photo_wrap").first();
+            if (photoWrap != null) {
+                // Ищем style="background-image: url(...)"
+                String style = photoWrap.attr("style");
+                if (style.contains("background-image")) {
+                    String imageUrl = extractUrlFromStyle(style);
+                    if (imageUrl != null) {
+                        mediaInfo.hasMedia = true;
+                        mediaInfo.mediaType = "photo";
+                        mediaInfo.mediaUrl = imageUrl;
+                        return mediaInfo;
+                    }
+                }
+            }
+
+            // 2. Ищем обычные img теги
+            Element img = messageElement.select("img").first();
+            if (img != null) {
+                String src = img.attr("src");
+                if (!src.isEmpty() && !src.contains("emoji")) { // Исключаем эмодзи
+                    mediaInfo.hasMedia = true;
+                    mediaInfo.mediaType = "photo";
+                    mediaInfo.mediaUrl = src;
+                    return mediaInfo;
+                }
+            }
+
+            // 3. Ищем видео
+            Element video = messageElement.select("video").first();
+            if (video != null) {
+                String src = video.attr("src");
+                if (!src.isEmpty()) {
+                    mediaInfo.hasMedia = true;
+                    mediaInfo.mediaType = "video";
+                    mediaInfo.mediaUrl = src;
+                    return mediaInfo;
+                }
+            }
+
+            // 4. Ищем ссылки на медиафайлы
+            Elements links = messageElement.select("a[href]");
+            for (Element link : links) {
+                String href = link.attr("href");
+                if (isMediaUrl(href)) {
+                    mediaInfo.hasMedia = true;
+                    mediaInfo.mediaType = getMediaTypeFromUrl(href);
+                    mediaInfo.mediaUrl = href;
+                    return mediaInfo;
+                }
+            }
+
+        } catch (Exception e) {
+            log.debug("Ошибка при извлечении медиа: {}", e.getMessage());
+        }
+
+        return mediaInfo;
+    }
+
+    /**
+     * 🔗 Извлекает URL из CSS style атрибута
+     */
+    private String extractUrlFromStyle(String style) {
+        try {
+            Pattern urlPattern = Pattern.compile("url\\(['\"]?(.*?)['\"]?\\)");
+            Matcher matcher = urlPattern.matcher(style);
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
+        } catch (Exception e) {
+            log.debug("Ошибка извлечения URL из style: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 🎭 Проверяет, является ли URL медиафайлом
+     */
+    private boolean isMediaUrl(String url) {
+        if (url == null || url.isEmpty()) return false;
+
+        String lowercaseUrl = url.toLowerCase();
+        return lowercaseUrl.contains("jpg") || lowercaseUrl.contains("jpeg") ||
+                lowercaseUrl.contains("png") || lowercaseUrl.contains("gif") ||
+                lowercaseUrl.contains("mp4") || lowercaseUrl.contains("webm") ||
+                lowercaseUrl.contains("photo") || lowercaseUrl.contains("video");
+    }
+
+    /**
+     * 🎨 Определяет тип медиа по URL
+     */
+    private String getMediaTypeFromUrl(String url) {
+        if (url == null) return "unknown";
+
+        String lowercaseUrl = url.toLowerCase();
+        if (lowercaseUrl.contains("mp4") || lowercaseUrl.contains("webm") || lowercaseUrl.contains("video")) {
+            return "video";
+        }
+        if (lowercaseUrl.contains("jpg") || lowercaseUrl.contains("jpeg") ||
+                lowercaseUrl.contains("png") || lowercaseUrl.contains("gif") || lowercaseUrl.contains("photo")) {
+            return "photo";
+        }
+        return "document";
+    }
+
+    /**
+     * 📷 Внутренний класс для хранения информации о медиа
+     */
+    private static class MediaInfo {
+        boolean hasMedia = false;
+        String mediaType = null;
+        String mediaUrl = null;
     }
 
     /**
@@ -276,6 +440,8 @@ public class TelegramNewsService {
 
         return LocalDateTime.now();
     }
+
+    // Остальные методы остаются без изменений...
 
     /**
      * 📰 Получение последних новостей (улучшенная версия)

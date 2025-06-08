@@ -1,118 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.ta.controller.MainController"
-            style="-fx-background-color: #f8f9fa;">
-    <top>
-        <!-- Верхняя панель -->
-        <VBox style="-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0, 0, 2);">
-            <children>
-                <!-- Заголовок приложения -->
-                <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-padding: 20 24 12 24;">
-                    <children>
-                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
-                               text="📈 Trading Analytics" />
-                        <Region HBox.hgrow="ALWAYS" />
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="900.0" prefWidth="1400.0"
+      xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.ta.controller.MainController">
 
-                        <!-- Быстрый доступ к настройкам Telegram -->
-                        <Button fx:id="telegramQuickButton" onAction="#showTelegramSettings"
-                                style="-fx-background-color: #f8f9fa; -fx-text-fill: #6c757d; -fx-font-size: 11px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-cursor: hand; -fx-padding: 6 10 6 10; -fx-border-width: 1;"
-                                text="📱" />
+    <!-- Верхняя панель навигации -->
+    <HBox alignment="CENTER_LEFT" spacing="16.0"
+          style="-fx-background-color: linear-gradient(to bottom, #ffffff, #f8f9fa); -fx-border-color: #dee2e6; -fx-border-width: 0 0 1 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 1);">
+        <children>
+            <!-- Логотип и название -->
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <children>
+                    <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="📊" />
+                    <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Trading Analytics" />
+                </children>
+            </HBox>
 
-                        <Button fx:id="refreshButton" onAction="#refreshCurrentView"
-                                style="-fx-background-color: #f8f9fa; -fx-text-fill: #6c757d; -fx-font-size: 11px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-border-color: #dee2e6; -fx-border-radius: 8; -fx-cursor: hand; -fx-padding: 6 10 6 10; -fx-border-width: 1;"
-                                text="🔄" />
+            <Separator orientation="VERTICAL" />
 
-                        <Label fx:id="currentTimeLabel"
-                               style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d; -fx-font-weight: 500;"
-                               text="01.01.2024 12:00:00" />
-                    </children>
-                </HBox>
+            <!-- Навигационные кнопки -->
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <children>
+                    <Button fx:id="homeButton" onAction="#showHome" text="🏠 Главная" />
+                    <Button fx:id="tradesListButton" onAction="#showTradesList" text="📈 Сделки" />
+                    <Button fx:id="addTradeButton" onAction="#showAddTrade" text="➕ Добавить" />
+                    <Button fx:id="statisticsButton" onAction="#showStatistics" text="📊 Статистика" />
+                    <Button fx:id="positionCalculatorButton" onAction="#showPositionCalculator" text="Калькулятор" />
+                    <Button fx:id="averagingCalculatorButton" onAction="#showAveragingCalculator" text="📉 Усреднение" />
+                </children>
+            </HBox>
 
-                <!-- Минималистичная панель навигации -->
-                <HBox alignment="CENTER_LEFT" spacing="16.0" style="-fx-padding: 0 24 20 24;">
-                    <children>
-                        <!-- Контейнер для навигационных кнопок с закругленным фоном -->
-                        <HBox spacing="4.0" alignment="CENTER_LEFT"
-                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 16; -fx-padding: 6;">
-                            <children>
-                                <Button fx:id="homeButton" onAction="#showHome"
-                                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20; -fx-effect: dropshadow(gaussian, rgba(52,152,219,0.2), 4, 0, 0, 1);"
-                                        text="🏠 Главная" />
+            <!-- Разделитель для заполнения пространства -->
+            <Region HBox.hgrow="ALWAYS" />
 
-                                <Button fx:id="tradesListButton" onAction="#showTradesList"
-                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;"
-                                        text="📋 Сделки" />
+            <!-- Правая панель с утилитами -->
+            <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                <children>
+                    <!-- Кнопка переключения новостей -->
+                    <Button fx:id="toggleNewsButton" />
 
-                                <Button fx:id="addTradeButton" onAction="#showAddTrade"
-                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;"
-                                        text="➕ Добавить сделку" />
+                    <Separator orientation="VERTICAL" />
 
-                                <Button fx:id="statisticsButton" onAction="#showStatistics"
-                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 20 12 20;"
-                                        text="📊 Аналитика" />
+                    <Button fx:id="refreshButton" onAction="#refreshCurrentView" text="🔄" />
 
-                                <Button fx:id="positionCalculatorButton" onAction="#showPositionCalculator"
-                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 16 12 16;"
-                                        text="📊 Калькулятор" />
+                    <!-- Настройки -->
+                    <MenuButton style="-fx-background-color: transparent; -fx-text-fill: #6c757d;" text="⚙️">
+                        <items>
+                            <MenuItem onAction="#showTelegramSettings" text="Настройки Telegram" />
+                            <MenuItem onAction="#showTwitterSettings" text="🐦 Настройки X" />
+                        </items>
+                    </MenuButton>
+                </children>
+            </HBox>
+        </children>
+        <padding>
+            <Insets bottom="12.0" left="16.0" right="16.0" top="12.0" />
+        </padding>
+    </HBox>
 
-                                <Button fx:id="averagingCalculatorButton" onAction="#showAveragingCalculator"
-                                        style="-fx-background-color: transparent; -fx-text-fill: #6c757d; -fx-font-size: 13px; -fx-font-weight: 600; -fx-background-radius: 12; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 12 16 12 16;"
-                                        text="📈 Усреднение" />
-                            </children>
-                        </HBox>
+    <!-- Основная область контента -->
+    <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS" />
 
-                        <Region HBox.hgrow="ALWAYS" />
-                    </children>
-                </HBox>
-            </children>
-        </VBox>
-    </top>
+    <!-- Нижняя строка состояния -->
+    <HBox alignment="CENTER_LEFT" spacing="16.0"
+          style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 1 0 0 0;">
+        <children>
+            <Label fx:id="statusLabel" style="-fx-text-fill: #6c757d; -fx-font-size: 12px;" text="Готов" />
 
-    <center>
-        <!-- Основная область контента -->
-        <StackPane fx:id="contentArea" style="-fx-background-color: #f8f9fa;" />
-    </center>
+            <Region HBox.hgrow="ALWAYS" />
 
-    <bottom>
-        <!-- Современная нижняя статусная панель -->
-        <HBox alignment="CENTER_LEFT" spacing="20.0"
-              style="-fx-background-color: white; -fx-padding: 16 24 16 24; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, -2);">
-            <children>
-                <Label fx:id="statusLabel"
-                       style="-fx-font-size: 13px; -fx-text-fill: #495057; -fx-font-weight: 500;"
-                       text="Готов к работе" />
+            <Label fx:id="telegramStatusLabel" style="-fx-font-size: 12px;" />
 
-                <Region HBox.hgrow="ALWAYS" />
+            <Separator orientation="VERTICAL" />
 
-                <HBox spacing="16.0" alignment="CENTER_RIGHT">
-                    <children>
-                        <!-- Статус Telegram - новый элемент -->
-                        <Label fx:id="telegramStatusLabel"
-                               style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: 500;"
-                               text="📱 Telegram: ⚙️ Не настроено" />
+            <Label fx:id="currentTimeLabel" style="-fx-text-fill: #6c757d; -fx-font-size: 12px;" />
 
-                        <Separator orientation="VERTICAL"
-                                   style="-fx-background-color: #e9ecef;"
-                                   prefHeight="16.0" />
+            <Label fx:id="versionLabel" style="-fx-text-fill: #adb5bd; -fx-font-size: 11px;" text="v1.0.4" />
+        </children>
+        <padding>
+            <Insets bottom="6.0" left="16.0" right="16.0" top="6.0" />
+        </padding>
+    </HBox>
 
-                        <Label fx:id="userInfoLabel"
-                               style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: 500;"
-                               text="👤 Пользователь: Трейдер" />
+    <!-- Скрытый контейнер для новостной панели -->
+    <VBox fx:id="newsContainer" managed="false" visible="false" />
 
-                        <Separator orientation="VERTICAL"
-                                   style="-fx-background-color: #e9ecef;"
-                                   prefHeight="16.0" />
-
-                        <Label fx:id="versionLabel"
-                               style="-fx-font-size: 12px; -fx-text-fill: #6c757d; -fx-font-weight: 500;"
-                               text="📱 Версия: 1.0.4" />
-                    </children>
-                </HBox>
-            </children>
-        </HBox>
-    </bottom>
-</BorderPane>
+</VBox>

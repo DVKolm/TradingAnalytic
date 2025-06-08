@@ -1,7 +1,7 @@
 package com.example.ta.repository;
 
-import com.example.ta.domain.Trade;
-import com.example.ta.domain.TradeStatus;
+import com.example.ta.domain.trading.Trade;
+import com.example.ta.domain.trading.TradeStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;

@@ -1,11 +1,11 @@
 
-package com.example.ta.controller;
+package com.example.ta.controller.trading;
 
 import com.example.ta.events.NavigationEvent;
 import com.example.ta.events.TradeDataChangedEvent;
-import com.example.ta.domain.Trade;
-import com.example.ta.domain.TradeStatus;
-import com.example.ta.domain.TradeType;
+import com.example.ta.domain.trading.Trade;
+import com.example.ta.domain.trading.TradeStatus;
+import com.example.ta.domain.trading.TradeType;
 import com.example.ta.service.TradeService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
